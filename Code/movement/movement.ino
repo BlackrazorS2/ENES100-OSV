@@ -3,7 +3,14 @@
 void setup() {
     // Initialize Enes100 Library
     // Team Name, Mission Type, Marker ID, TX Pin, RX Pin
-    Enes100.begin("DATA TEAM", DATA, 3, 10, 11);
+
+    int MARKER_ID = 3;
+    int TX_PIN = 2;
+    int RX_PIN = 4;
+    int location = new int[3];
+
+    
+    Enes100.begin("DATA TEAM", DATA, MARKER_ID, TX_PIN, RX_PIN);
 
     Enes100.print("Destination is at (");
     Enes100.print(Enes100.destination.x);
@@ -26,10 +33,13 @@ void loop() {
     Enes100.print("OSV is at (");
     Enes100.print(Enes100.location.x);
     Enes100.print(", ");
+    location[0] = Enes100.destination.x;
     Enes100.print(Enes100.location.y);
     Enes100.print(", ");
+    location[1] = Enes100.destination.y;
     Enes100.print(Enes100.location.theta);
     Enes100.println(")");
+    location[2] = Enes100.destination.theta;
 }
 
 void driveForwards() {
