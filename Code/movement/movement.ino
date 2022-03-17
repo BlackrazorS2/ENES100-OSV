@@ -10,6 +10,9 @@
 
     int MARKER_ID = 3;
     double xPos, yPos, angle;
+
+    boolean LEFT = true;
+    boolean RIGHT = false;
    
 void setup() {
     // Initialize Enes100 Library
@@ -21,25 +24,78 @@ void setup() {
 
 void loop() {
     // Update the OSV's current location
-    while (!Enes100.updateLocation()) {
-        // OSV's location was not found
-        Enes100.println("404 Not Found");
+    if (resetLocation() == false) {
+      // emergency reverse
+      Enes100.println("BRUH HOW OUT OF AREANNA");
+      Enes100.println("WRITE THIS LATER, PROLLY BACKUP OSV");
     }
-    Enes100.print("OSV is at (");
-    Enes100.print(Enes100.location.x);
-    Enes100.print(", ");
-    xPos = Enes100.location.x;
-    Enes100.print(Enes100.location.y);
-    Enes100.print(", ");
-    yPos = Enes100.location.y;
-    Enes100.print(Enes100.location.theta);
-    Enes100.println(")");
-    angle = Enes100.location.theta;
+
+    if (getStartingSide()) {
+      
+    }
+    
+    
+
 }
 
-void driveForwards() {
+
+boolean resetLocation() {
+    if (Enes100.updateLocation()) {
+      xPos = Enes100.location.x;
+      yPos = Enes100.location.y;
+      angle = Enes100.location.theta;
+      return true;    
+    }
+    return false;
+}
+
+void driveForwards(double distance) {
   
 }
-void turn(int angle, boolean turningLeft) {
+
+void driveReverse(double distance) {
+  
+}
+
+//Left is true, right is false
+void turn(double angle, boolean turningLeft) {
+  
+}
+
+void setDirection(double angle) {
+  
+}
+
+boolean dropArm(double angle) {
+  
+}
+
+boolean raiseArm() {
+  
+}
+
+int getObstacleDistance() {
+  
+}
+
+//Left is true, right is false
+boolean getStartingSide() {
+  
+}
+
+boolean atMissionSite() {
+  
+}
+
+double getSignal() {
+  
+}
+
+double getMagnetism() {
+  
+}
+
+// Might need a lot of thinking
+void wiggle() {
   
 }
