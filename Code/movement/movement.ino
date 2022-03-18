@@ -50,19 +50,39 @@ boolean resetLocation() {
 }
 
 void driveForwards(double distance) {
-  
+  resetLocation();
+  int initialXPos = xPos;
+  int initialYPos = yPos;
+  while (sqrt(sq(xPos - initialXPos) + sq(yPos - initialYPos)) < distance) {
+    //Activate both wheel motors
+    resetLocation();
+  }
 }
 
 void driveReverse(double distance) {
-  
+  resetLocation();
+  int initialXPos = xPos;
+  int initialYPos = yPos;
+  while (sqrt(sq(xPos - initialXPos) + sq(yPos - initialYPos)) < distance) {
+    //Activate both wheel motors backwards
+    resetLocation();
+  }
 }
 
 //Left is true, right is false
-void turn(double angle, boolean turningLeft) {
-  
+void turn(double newAngle, boolean turningLeft) {
+  resetLocation();
+  while (angle != newAngle) { //Change from != as they're doubles
+    if (turningLeft) {
+      //Right wheels drive forward, left wheels drive backwards
+    } else {
+      //Left wheels drive forward, right wheels drive backwards
+    }
+    resetLocation();
+  }
 }
 
-void setDirection(double angle) {
+void setDirection(double newAngle) { //Is this really neccessary?
   
 }
 
@@ -80,7 +100,12 @@ int getObstacleDistance() {
 
 //Left is true, right is false
 boolean getStartingSide() {
-  
+  resetLocation();
+  if (yPos > 1) { //ASSUMING 0,0 is bottom left of arena
+    return true;
+  } else {
+    return false;
+  }
 }
 
 boolean atMissionSite() {
@@ -95,7 +120,7 @@ double getMagnetism() {
   
 }
 
-// Might need a lot of thinking
+// Might need a lot of thinking, probably just drive backwards tiny amount
 void wiggle() {
   
 }
