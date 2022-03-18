@@ -10,6 +10,8 @@
 
     int MARKER_ID = 3;
     double xPos, yPos, angle;
+    
+    boolean startingPosition;
 
     boolean LEFT = true;
     boolean RIGHT = false;
@@ -29,10 +31,19 @@ void loop() {
       Enes100.println("BRUH HOW OUT OF AREANNA");
       Enes100.println("WRITE THIS LATER, PROLLY BACKUP OSV");
     }
-
-    if (getStartingSide()) {
-      
+    
+    startingPosition = getStartingSide();
+    if (startingPosition) {
+      turn(-PI/2,LEFT); //Current direction of turning is arbitrary, create method of determining later.
+    } else {
+      turn(PI/2,RIGHT);
     }
+    driveForwards(.9);
+    while (atMissionSite != false){
+      driveForwards(.05);
+      delay(250);
+    }
+    
     
     
 
@@ -98,7 +109,7 @@ int getObstacleDistance() {
   
 }
 
-//Left is true, right is false
+//Top is true, bottom is false
 boolean getStartingSide() {
   resetLocation();
   if (yPos > 1) { //ASSUMING 0,0 is bottom left of arena
@@ -108,8 +119,19 @@ boolean getStartingSide() {
   }
 }
 
+//Top is true, bottom is false
 boolean atMissionSite() {
-  
+  resetLocation();
+  if (startingPosition) {
+    if (yPos > .5 && yPos < .7) { //Change values after testing aruco marker placement
+      return true;
+    }
+  } else {
+    if (yPos > 1.3 && yPos < 1.5) { //Change values after testing aruco marker placement
+      return true;
+    }
+  }
+  return false;
 }
 
 double getSignal() {
@@ -122,5 +144,8 @@ double getMagnetism() {
 
 // Might need a lot of thinking, probably just drive backwards tiny amount
 void wiggle() {
-  
+  while(getSignal() < .1) {
+    driveReverse(.05); 
+    delay(250); //Wait 1/4 of a second
+  }
 }
