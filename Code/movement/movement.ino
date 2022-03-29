@@ -83,7 +83,7 @@ void driveReverse(double distance) {
 //Left is true, right is false
 void turn(double newAngle, boolean turningLeft) {
   resetLocation();
-  while (angle != newAngle) { //Change from != as they're doubles
+  while (angle > newAngle * 1.05 || angle < newAngle * .95) {
     if (turningLeft) {
       //Right wheels drive forward, left wheels drive backwards
     } else {
