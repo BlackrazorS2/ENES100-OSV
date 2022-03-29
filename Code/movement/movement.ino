@@ -8,7 +8,7 @@
     int RX_PIN = 4;
     int SERVO_PIN = 6;
 
-    int MARKER_ID = 3;
+    int MARKER_ID = 10;
     double xPos, yPos, angle;
     
     boolean startingPosition; //Top is true, bottom is false
@@ -31,7 +31,7 @@ void loop() {
       Enes100.println("BRUH HOW OUT OF AREANNA");
       Enes100.println("WRITE THIS LATER, PROLLY BACKUP OSV");
     }
-
+    
     //This portion of code determines starting side and gets us to the mission site.
     
     startingPosition = getStartingSide();
@@ -56,15 +56,15 @@ void loop() {
       magnetic = getMagnetism();
       wiggle();
     }
-    Serial.print("The signal is: ");
-    Serial.println(signal);
+    Enes100.print("The signal is: ");
+    Enes100.println(signal);
     if (magnetic){
-      Serial.print("The puck was magnetic");
+      Enes100.print("The puck was magnetic");
     } else {
-      Serial.print("The puck was not magnetic");
+      Enes100.print("The puck was not magnetic");
     }
     raiseArm();
-
+  
     //This portion of code sets up the vehicle to start checking each lane.
     
     driveReverse(1);
@@ -112,7 +112,7 @@ void loop() {
       driveForwards(.6);
       turn(0,LEFT);
     }
-    driveForwards(1);
+    driveForwards(.7);
 
     //We should be over the finish line now
     
@@ -162,10 +162,6 @@ void turn(double newAngle, boolean turningLeft) {
   }
 }
 
-void setDirection(double newAngle) { //Is this really neccessary?
-  
-}
-
 boolean dropArm(double angle) {
   
 }
@@ -213,8 +209,6 @@ double getMagnetism() {
 
 // Might need a lot of thinking, probably just drive backwards tiny amount
 void wiggle() {
-  while(getSignal() < .1) {
-    driveReverse(.05); 
-    delay(250); //Wait 1/4 of a second
-  }
+   driveReverse(.05); 
+   delay(250); //Wait 1/4 of a second
 }
