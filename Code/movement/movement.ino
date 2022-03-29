@@ -11,7 +11,7 @@
     int MARKER_ID = 3;
     double xPos, yPos, angle;
     
-    boolean startingPosition;
+    boolean startingPosition; //Top is true, bottom is false
 
     boolean LEFT = true;
     boolean RIGHT = false;
@@ -31,6 +31,8 @@ void loop() {
       Enes100.println("BRUH HOW OUT OF AREANNA");
       Enes100.println("WRITE THIS LATER, PROLLY BACKUP OSV");
     }
+
+    //This portion of code determines starting side and gets us to the mission site.
     
     startingPosition = getStartingSide();
     if (startingPosition) {
@@ -43,10 +45,77 @@ void loop() {
       driveForwards(.05);
       delay(250);
     }
-    
-    
-    
 
+    //This portion of code drops the arm and collects the data
+    
+    dropArm(PI/2); //idk what angle to put here
+    double signal;
+    boolean magnetic;
+    while (getSignal() < .3){
+      signal = getSignal();
+      magnetic = getMagnetism();
+      wiggle();
+    }
+    Serial.print("The signal is: ");
+    Serial.println(signal);
+    if (magnetic){
+      Serial.print("The puck was magnetic");
+    } else {
+      Serial.print("The puck was not magnetic");
+    }
+    raiseArm();
+
+    //This portion of code sets up the vehicle to start checking each lane.
+    
+    driveReverse(1);
+    if (startingPosition) {
+      turn(0,LEFT);
+    } else {
+      turn(0,RIGHT);
+    }
+
+    //This portion of code checks each lane and gets us to the ending area. (CONDENSE LATER)
+    
+    if (getObstacleDistance() > 2){ //Checks 1st lane
+      driveForwards(2.8);
+    } else {
+      if (startingPosition) { //Top is true
+       turn(-PI/2,RIGHT);
+        driveForwards(.5);
+        turn(0,LEFT);
+     } else {
+        turn(PI/2,LEFT);
+        driveForwards(.5);
+        turn(0,RIGHT);
+     }
+      if (getObstacleDistance() > 2){ //Checks 2nd lane
+        driveForwards(2.8);
+      } else {
+        if (startingPosition) { //Top is true
+          turn(-PI/2,RIGHT);
+          driveForwards(.5);
+          turn(0,LEFT);
+       } else {
+          turn(PI/2,LEFT);
+          driveForwards(.5);
+          turn(0,RIGHT);
+        }
+        driveForwards(2.8); //If we're at the 3rd lane, we assume that it's the clear one
+      }
+    }
+
+    //This portion of code gets us facing the log and drives over it.
+    
+    resetLocation();
+    if (yPos > .9) {
+      turn(-PI/2,RIGHT);
+      driveForwards(.6);
+      turn(0,LEFT);
+    }
+    driveForwards(1);
+
+    //We should be over the finish line now
+    
 }
 
 
@@ -83,7 +152,7 @@ void driveReverse(double distance) {
 //Left is true, right is false
 void turn(double newAngle, boolean turningLeft) {
   resetLocation();
-  while (angle > newAngle * 1.05 || angle < newAngle * .95) {
+  while (angle > newAngle * 1.05 || angle < newAngle * .95) { //Current margin of error is arbitrary, adjust later
     if (turningLeft) {
       //Right wheels drive forward, left wheels drive backwards
     } else {
