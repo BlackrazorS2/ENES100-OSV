@@ -31,7 +31,10 @@ void loop() {
       Enes100.println("BRUH HOW OUT OF AREANNA");
       Enes100.println("WRITE THIS LATER, PROLLY BACKUP OSV");
     }
-    
+      Enes100.updateLocation();
+      Enes100.println("Location found");  //DELETE LATER 
+      Enes100.println(xPos);
+      
     //This portion of code determines starting side and gets us to the mission site.
     
     startingPosition = getStartingSide();
