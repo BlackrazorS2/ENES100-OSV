@@ -7,6 +7,8 @@
     int TX_PIN = 2;
     int RX_PIN = 4;
     int SERVO_PIN = 6;
+    int LEFT_MOTOR = 11;
+    int RIGHT_MOTOR = 10;
 
     int MARKER_ID = 10;
     double xPos, yPos, angle;
@@ -22,6 +24,9 @@ void setup() {
     
     Enes100.begin("Frostbytes", DATA, MARKER_ID, TX_PIN, RX_PIN);
 
+    pinMode(LEFT_MOTOR, OUTPUT);
+    pinMode(RIGHT_MOTOR, OUTPUT);
+
 }
 
 void loop() {
@@ -33,10 +38,15 @@ void loop() {
     }
       Enes100.updateLocation();
       Enes100.println("Location found");  //DELETE LATER 
+      Enes100.print("x Position is: ");
       Enes100.println(xPos);
+      Enes100.print("y Position is: ");
+      Enes100.println(yPos);
+      Enes100.print("Current angle is: ");
+      Enes100.println(angle);
       
     //This portion of code determines starting side and gets us to the mission site.
-    
+    /*
     startingPosition = getStartingSide();
     if (startingPosition) {
       turn(-PI/2,LEFT); //Current direction of turning is arbitrary, create method of determining later.
@@ -118,7 +128,7 @@ void loop() {
     driveForwards(.7);
 
     //We should be over the finish line now
-    
+    */
 }
 
 
@@ -137,7 +147,8 @@ void driveForwards(double distance) {
   int initialXPos = xPos;
   int initialYPos = yPos;
   while (sqrt(sq(xPos - initialXPos) + sq(yPos - initialYPos)) < distance) {
-    //Activate both wheel motors
+    analogWrite(LEFT_MOTOR,255);
+    analogWrite(RIGHT_MOTOR,255);
     resetLocation();
   }
 }
@@ -147,7 +158,8 @@ void driveReverse(double distance) {
   int initialXPos = xPos;
   int initialYPos = yPos;
   while (sqrt(sq(xPos - initialXPos) + sq(yPos - initialYPos)) < distance) {
-    //Activate both wheel motors backwards
+    analogWrite(LEFT_MOTOR,-255);
+    analogWrite(RIGHT_MOTOR,-255);
     resetLocation();
   }
 }
@@ -158,8 +170,12 @@ void turn(double newAngle, boolean turningLeft) {
   while (angle > newAngle * 1.05 || angle < newAngle * .95) { //Current margin of error is arbitrary, adjust later
     if (turningLeft) {
       //Right wheels drive forward, left wheels drive backwards
+      analogWrite(LEFT_MOTOR,-255);
+      analogWrite(RIGHT_MOTOR,255);
     } else {
       //Left wheels drive forward, right wheels drive backwards
+      analogWrite(LEFT_MOTOR,255);
+      analogWrite(RIGHT_MOTOR,-255);
     }
     resetLocation();
   }
