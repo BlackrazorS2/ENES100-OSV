@@ -5,21 +5,28 @@
 // http://enes100.umd.edu/libraries/enes100
 // https://create.arduino.cc/projecthub/ryanchan/how-to-use-the-l298n-motor-driver-b124c5
 
+    //digital pins
+
     int TX_PIN = 12;
     int RX_PIN = 13;
     int SERVO_PIN = 6;
     int LEFT_MOTOR_PIN1 = 3, LEFT_MOTOR_PIN2 = 2;
     int RIGHT_MOTOR_PIN1 = 5, RIGHT_MOTOR_PIN2 = 4;
+    int MAGNET_PIN = 7;
+    int SIGNAL_PIN = 6;
 
     //analog pins
+
     
-    int MAGNET_PIN = 1;
+    //other
 
     int MARKER_ID = 9;
-    double xPos, yPos, angle;
     
+    double xPos, yPos, angle;
     boolean startingPosition; //Top is true, bottom is false
 
+    //constants
+    
     boolean LEFT = true;
     boolean RIGHT = false;
    
@@ -29,11 +36,19 @@ void setup() {
     
     Enes100.begin("Frostbytes", DATA, MARKER_ID, TX_PIN, RX_PIN);
 
+    //Inputs
+
+    pinMode(MAGNET_PIN, INPUT);
+    pinMode(SIGNAL_PIN, INPUT);
+
+    //Outputs
+    
     pinMode(LEFT_MOTOR_PIN1, OUTPUT);
     pinMode(LEFT_MOTOR_PIN2, OUTPUT);
     pinMode(RIGHT_MOTOR_PIN1, OUTPUT);
     pinMode(RIGHT_MOTOR_PIN2, OUTPUT);
-    pinMode(MAGNET_PIN, INPUT);
+    pinMode(SERVO_PIN, OUTPUT);
+    
 }
 
 void loop() {
@@ -249,15 +264,13 @@ boolean atMissionSite() {
 }
 
 double getSignal() {
-  
+  return (double) (digitalRead(SIGNAL_PIN) / 1023);
 }
 
 double getMagnetism() {
   if (digitalRead(MAGNET_PIN) == HIGH) {
-    Enes100.println("MAGNET DETECTED");
     return true;
   } else {
-    Enes100.println("NOT DETECTED");
     return false;
   }
 }
