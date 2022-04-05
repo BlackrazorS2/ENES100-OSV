@@ -4,6 +4,7 @@
 // https://github.com/BlackrazorS2/ENES100-OSV
 // http://enes100.umd.edu/libraries/enes100
 // https://create.arduino.cc/projecthub/ryanchan/how-to-use-the-l298n-motor-driver-b124c5
+// https://create.arduino.cc/projecthub/abdularbi17/ultrasonic-sensor-hc-sr04-with-arduino-tutorial-327ff6
 
     //digital pins
 
@@ -12,7 +13,8 @@
     int SERVO_PIN = 100; //Not decided
     int LEFT_MOTOR_PIN1 = 2, LEFT_MOTOR_PIN2 = 3;
     int RIGHT_MOTOR_PIN1 = 4, RIGHT_MOTOR_PIN2 = 5;
-    int MAGNET_PIN = 7;
+    int ULTRA_SONIC_PWM = 6, ULTRA_SONIC_PIN2 = 7;
+    int MAGNET_PIN = 8;
 
     //analog pins
 
@@ -20,7 +22,10 @@
     
     //other
 
-    int MARKER_ID = 9;
+    double duration;
+    double distance;
+
+    int MARKER_ID = 6;
     
     double xPos, yPos, angle;
     boolean startingPosition; //Top is true, bottom is false
@@ -40,6 +45,7 @@ void setup() {
 
     pinMode(MAGNET_PIN, INPUT);
     pinMode(SIGNAL_PIN, INPUT);
+    pinMode(ULTRA_SONIC_PIN2, INPUT);
 
     //Outputs
     
@@ -48,20 +54,41 @@ void setup() {
     pinMode(RIGHT_MOTOR_PIN1, OUTPUT);
     pinMode(RIGHT_MOTOR_PIN2, OUTPUT);
     pinMode(SERVO_PIN, OUTPUT);
-    
+    pinMode(ULTRA_SONIC_PWM, OUTPUT);
+
+    Serial.begin(9600);
+    Serial.println("Running");    
 }
 
 void loop() {
+
+
     // Update the OSV's current location
 
-    if (getMagnetism()) {
-      Enes100.println("Detected");
-    } else {
-      Enes100.println("Not");
-    }
-    delay(1000);
+    // Code for MS5
     /*
+    driveForwards(1);
+    turn(PI/2, LEFT);
+    turn(PI/2, LEFT);
+    turn(PI, RIGHT);
+    */
+
+    //SIGNAL TEST
+    /*
+    Enes100.println("Signal is: ");
+    Enes100.println(getSignal());
+    delay(500);
+    */
     
+    //ULTRA SONIC TEST
+    
+    Enes100.println("Ultra sonic sensor distance");
+    Enes100.println(getObstacleDistance());
+    delay(500);
+    
+    
+    //TESTING ARUCO
+    /*
     if (resetLocation() == false) {
       // emergency reverse
       Enes100.println("BRUH HOW OUT OF AREANNA");
@@ -78,6 +105,8 @@ void loop() {
        Enes100.println(angle);
        delay(1000);
     }
+    */
+    
     //This portion of code determines starting side and gets us to the mission site.
     /*
     startingPosition = getStartingSide();
@@ -235,7 +264,16 @@ boolean raiseArm() {  //We might want to condense these 2 into one function by a
 }
 
 double getObstacleDistance() {
-  //return ultra sonic sensor value
+  digitalWrite(ULTRA_SONIC_PWM, LOW);
+  delayMicroseconds(2);
+  digitalWrite(ULTRA_SONIC_PWM, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(ULTRA_SONIC_PWM, LOW);
+  duration = pulseIn(ULTRA_SONIC_PIN2, HIGH);
+  distance = duration * 0.034 / 2;
+  distance = distance / 100;
+  return distance;
+  
 }
 
 //Top is true, bottom is false
@@ -264,7 +302,7 @@ boolean atMissionSite() {
 }
 
 double getSignal() {
-  return (double) (analogRead(SIGNAL_PIN) / 1023); //gives circuit value from 0-1
+  return (((double) analogRead(SIGNAL_PIN)) / 1023); //gives circuit value from 0-1
 }
 
 double getMagnetism() {
