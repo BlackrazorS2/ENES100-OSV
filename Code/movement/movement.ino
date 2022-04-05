@@ -9,14 +9,14 @@
 
     int TX_PIN = 12;
     int RX_PIN = 13;
-    int SERVO_PIN = 6;
-    int LEFT_MOTOR_PIN1 = 3, LEFT_MOTOR_PIN2 = 2;
-    int RIGHT_MOTOR_PIN1 = 5, RIGHT_MOTOR_PIN2 = 4;
+    int SERVO_PIN = 100; //Not decided
+    int LEFT_MOTOR_PIN1 = 2, LEFT_MOTOR_PIN2 = 3;
+    int RIGHT_MOTOR_PIN1 = 4, RIGHT_MOTOR_PIN2 = 5;
     int MAGNET_PIN = 7;
-    int SIGNAL_PIN = 6;
 
     //analog pins
 
+    int SIGNAL_PIN = A0;
     
     //other
 
@@ -227,15 +227,15 @@ void turn(double turnAngle, boolean turningLeft) {
 }
 
 boolean dropArm() {
-  
+  //rotate servo by x degrees
 }
 
-boolean raiseArm() {
-  
+boolean raiseArm() {  //We might want to condense these 2 into one function by adding a boolean condition for dropping or raising
+  //rotate servo by -x degrees
 }
 
-int getObstacleDistance() {
-  
+double getObstacleDistance() {
+  //return ultra sonic sensor value
 }
 
 //Top is true, bottom is false
@@ -264,7 +264,7 @@ boolean atMissionSite() {
 }
 
 double getSignal() {
-  return (double) (digitalRead(SIGNAL_PIN) / 1023);
+  return (double) (analogRead(SIGNAL_PIN) / 1023); //gives circuit value from 0-1
 }
 
 double getMagnetism() {
@@ -277,6 +277,6 @@ double getMagnetism() {
 
 // Might need a lot of thinking, probably just drive backwards tiny amount
 void wiggle() {
-   driveReverse(.05); 
+   driveReverse(.025); 
    delay(250); //Wait 1/4 of a second
 }
