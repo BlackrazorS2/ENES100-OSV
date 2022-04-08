@@ -23,9 +23,9 @@
     //other
 
     double duration;
-    double distance;
+    double ultraDistance;
 
-    int MARKER_ID = 6;
+    int MARKER_ID = 19;
     
     double xPos, yPos, angle;
     boolean startingPosition; //Top is true, bottom is false
@@ -57,7 +57,7 @@ void setup() {
     pinMode(ULTRA_SONIC_PWM, OUTPUT);
 
     Serial.begin(9600);
-    Serial.println("Running");    
+    Serial.println("Running");
 }
 
 void loop() {
@@ -66,11 +66,19 @@ void loop() {
     // Update the OSV's current location
 
     // Code for MS5
+
+    delay(10000); //gives us time to get to the arena
+
+    //MOVEMENT FUNCTIONS TEST
+
+    
+
     /*
     driveForwards(1);
     turn(PI/2, LEFT);
-    turn(PI/2, LEFT);
-    turn(PI, RIGHT);
+    turn(PI, LEFT);
+    turn(0, RIGHT);
+    driveReverse(1);
     */
 
     //SIGNAL TEST
@@ -81,14 +89,15 @@ void loop() {
     */
     
     //ULTRA SONIC TEST
-    
+
+    /*
     Enes100.println("Ultra sonic sensor distance");
     Enes100.println(getObstacleDistance());
     delay(500);
-    
+    */
     
     //TESTING ARUCO
-    /*
+    
     if (resetLocation() == false) {
       // emergency reverse
       Enes100.println("BRUH HOW OUT OF AREANNA");
@@ -105,7 +114,7 @@ void loop() {
        Enes100.println(angle);
        delay(1000);
     }
-    */
+    
     
     //This portion of code determines starting side and gets us to the mission site.
     /*
@@ -215,14 +224,24 @@ void driveForwards(double distance) {
     digitalWrite(RIGHT_MOTOR_PIN1, HIGH);
     digitalWrite(RIGHT_MOTOR_PIN2, LOW);
     resetLocation();
+    Enes100.print("x Position is: ");
+    Enes100.println(xPos);
+    Enes100.print("y Position is: ");
+    Enes100.println(yPos);
   }
 }
 
 void driveReverse(double distance) {
+  delay(1000);
   resetLocation();
   int initialXPos = xPos;
   int initialYPos = yPos;
+  
   while (sqrt(sq(xPos - initialXPos) + sq(yPos - initialYPos)) < distance) {
+
+    Enes100.print("pythagorean calculations");
+    Enes100.println(sqrt(sq(xPos - initialXPos) + sq(yPos - initialYPos)));
+    
     digitalWrite(LEFT_MOTOR_PIN1, LOW);
     digitalWrite(LEFT_MOTOR_PIN2, HIGH);
 
@@ -255,11 +274,7 @@ void turn(double turnAngle, boolean turningLeft) {
   }
 }
 
-boolean dropArm() {
-  //rotate servo by x degrees
-}
-
-boolean raiseArm() {  //We might want to condense these 2 into one function by adding a boolean condition for dropping or raising
+boolean raiseArm(double armAngle) {  //We might want to condense these 2 into one function by adding a boolean condition for dropping or raising
   //rotate servo by -x degrees
 }
 
@@ -270,20 +285,22 @@ double getObstacleDistance() {
   delayMicroseconds(10);
   digitalWrite(ULTRA_SONIC_PWM, LOW);
   duration = pulseIn(ULTRA_SONIC_PIN2, HIGH);
-  distance = duration * 0.034 / 2;
-  distance = distance / 100;
-  return distance;
+  ultraDistance = duration * 0.034 / 2;
+  ultraDistance = ultraDistance / 100;
+  return ultraDistance;
   
 }
 
 //Top is true, bottom is false
 boolean getStartingSide() {
   resetLocation();
-  if (yPos > 1) { //ASSUMING 0,0 is bottom left of arena
+/*  if (yPos > 1) { //ASSUMING 0,0 is bottom left of arena
     return true;
   } else {
     return false;
-  }
+  }*/
+
+  return (yPos > 1);
 }
 
 //Top is true, bottom is false
