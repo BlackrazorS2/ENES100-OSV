@@ -27,7 +27,7 @@
     double ultraDistance;
     Servo servo;
 
-    int MARKER_ID = 19;
+    int MARKER_ID = 6;
     
     double xPos, yPos, angle;
     boolean startingPosition; //Top is true, bottom is false
@@ -71,19 +71,18 @@ void loop() {
 
     // Code for MS5
 
-    delay(10000); //gives us time to get to the arena
+    delay(20000); //gives us time to get to the arena
 
     //MOVEMENT FUNCTIONS TEST
 
+    Enes100.println("Starting now");
     
-
-    /*
+    
     driveForwards(1);
     turn(PI/2, LEFT);
-    turn(PI, LEFT);
     turn(0, RIGHT);
     driveReverse(1);
-    */
+    
 
     //SIGNAL TEST
     /*
@@ -101,7 +100,7 @@ void loop() {
     */
     
     //TESTING ARUCO
-    
+    /*
     if (resetLocation() == false) {
       // emergency reverse
       Enes100.println("BRUH HOW OUT OF AREANNA");
@@ -118,7 +117,9 @@ void loop() {
        Enes100.println(angle);
        delay(1000);
     }
-    
+    */
+
+    //START OF ACTUAL MISSION
     
     //This portion of code determines starting side and gets us to the mission site.
     /*
@@ -219,8 +220,8 @@ boolean resetLocation() {
 
 void driveForwards(double distance) {
   resetLocation();
-  int initialXPos = xPos;
-  int initialYPos = yPos;
+  double initialXPos = xPos;
+  double initialYPos = yPos;
   while (sqrt(sq(xPos - initialXPos) + sq(yPos - initialYPos)) < distance) {
     digitalWrite(LEFT_MOTOR_PIN1, HIGH);
     digitalWrite(LEFT_MOTOR_PIN2, LOW);
@@ -228,24 +229,16 @@ void driveForwards(double distance) {
     digitalWrite(RIGHT_MOTOR_PIN1, HIGH);
     digitalWrite(RIGHT_MOTOR_PIN2, LOW);
     resetLocation();
-    Enes100.print("x Position is: ");
-    Enes100.println(xPos);
-    Enes100.print("y Position is: ");
-    Enes100.println(yPos);
   }
 }
 
 void driveReverse(double distance) {
-  delay(1000);
   resetLocation();
-  int initialXPos = xPos;
-  int initialYPos = yPos;
+  double initialXPos = xPos;
+  double initialYPos = yPos;
   
   while (sqrt(sq(xPos - initialXPos) + sq(yPos - initialYPos)) < distance) {
 
-    Enes100.print("pythagorean calculations");
-    Enes100.println(sqrt(sq(xPos - initialXPos) + sq(yPos - initialYPos)));
-    
     digitalWrite(LEFT_MOTOR_PIN1, LOW);
     digitalWrite(LEFT_MOTOR_PIN2, HIGH);
 
@@ -257,8 +250,9 @@ void driveReverse(double distance) {
 
 //Left is true, right is false
 void turn(double turnAngle, boolean turningLeft) {
+  //(angle < PI) ? angle : angle - (2PI)
   resetLocation();
-  while (angle > turnAngle * 1.05 || angle < turnAngle * .95) { //Current margin of error is arbitrary, adjust later
+  while (angle > turnAngle + .01 || angle < turnAngle - .01) { //Current margin of error is arbitrary, adjust later
     if (turningLeft) {
       //Right wheels drive forward, left wheels drive backwards
       digitalWrite(LEFT_MOTOR_PIN1, LOW);
@@ -338,4 +332,10 @@ double getMagnetism() {
 void wiggle() {
    driveReverse(.025); 
    delay(250); //Wait 1/4 of a second
+}
+
+void dance() {
+  while(true){
+    delay(100);
+  }
 }
