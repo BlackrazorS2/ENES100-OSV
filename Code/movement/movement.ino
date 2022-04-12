@@ -1,4 +1,5 @@
 #include "Enes100.h"
+#include "Servo.h"
 
 // Links
 // https://github.com/BlackrazorS2/ENES100-OSV
@@ -10,7 +11,7 @@
 
     int TX_PIN = 12;
     int RX_PIN = 13;
-    int SERVO_PIN = 100; //Not decided
+    int SERVO_PIN = 9;
     int LEFT_MOTOR_PIN1 = 2, LEFT_MOTOR_PIN2 = 3;
     int RIGHT_MOTOR_PIN1 = 4, RIGHT_MOTOR_PIN2 = 5;
     int ULTRA_SONIC_PWM = 6, ULTRA_SONIC_PIN2 = 7;
@@ -24,6 +25,7 @@
 
     double duration;
     double ultraDistance;
+    Servo servo;
 
     int MARKER_ID = 19;
     
@@ -46,6 +48,8 @@ void setup() {
     pinMode(MAGNET_PIN, INPUT);
     pinMode(SIGNAL_PIN, INPUT);
     pinMode(ULTRA_SONIC_PIN2, INPUT);
+
+    servo.attach(SERVO_PIN);
 
     //Outputs
     
@@ -274,8 +278,8 @@ void turn(double turnAngle, boolean turningLeft) {
   }
 }
 
-boolean raiseArm(double armAngle) {  //We might want to condense these 2 into one function by adding a boolean condition for dropping or raising
-  //rotate servo by -x degrees
+boolean raiseArm(int armAngle) {  //We might want to condense these 2 into one function by adding a boolean condition for dropping or raising
+  servo.write(armAngle);
 }
 
 double getObstacleDistance() {
