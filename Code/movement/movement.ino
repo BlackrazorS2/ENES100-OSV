@@ -6,6 +6,7 @@
 // http://enes100.umd.edu/libraries/enes100
 // https://create.arduino.cc/projecthub/ryanchan/how-to-use-the-l298n-motor-driver-b124c5
 // https://create.arduino.cc/projecthub/abdularbi17/ultrasonic-sensor-hc-sr04-with-arduino-tutorial-327ff6
+// https://create.arduino.cc/projecthub/diyguyChris/high-torque-servo-motor-control-35b1cc
 
     //digital pins
 
@@ -25,9 +26,8 @@
 
     double duration;
     double ultraDistance;
-    Servo servo;
-
-    int MARKER_ID = 6;
+    Servo myServo;
+    int MARKER_ID = 8;
     
     double xPos, yPos, angle;
     boolean startingPosition; //Top is true, bottom is false
@@ -49,7 +49,7 @@ void setup() {
     pinMode(SIGNAL_PIN, INPUT);
     pinMode(ULTRA_SONIC_PIN2, INPUT);
 
-    servo.attach(SERVO_PIN);
+    myServo.attach(SERVO_PIN);
 
     //Outputs
     
@@ -69,26 +69,56 @@ void loop() {
 
     // Update the OSV's current location
 
-    // Code for MS5
+    //START OF TESTING CODE
 
-    delay(20000); //gives us time to get to the arena
+    delay(10000); //gives us time to get to the arena
+    Enes100.println("Half way to starting");
+    delay(10000); 
+    Enes100.println("Starting now");
+
+    //SERVO TEST
+    /*
+    raiseArm(-50);
+    Serial.println("Moved");
+    delay(1000);
+    raiseArm(50);
+    Serial.println("Moved");
+    delay(1000);
+    */
 
     //MOVEMENT FUNCTIONS TEST
-
-    Enes100.println("Starting now");
-    
-    
+    /*
     driveForwards(1);
     turn(PI/2, LEFT);
     turn(0, RIGHT);
     driveReverse(1);
-    
+    */
 
     //SIGNAL TEST
     /*
     Enes100.println("Signal is: ");
     Enes100.println(getSignal());
     delay(500);
+    */
+
+    //COMPLETE ARM TEST (Starting at mission site)
+    /*
+    raiseArm(50); //idk what angle to put here
+    double signal;
+    boolean magnetic;
+    while (getSignal() < .3){
+      signal = getSignal();
+      magnetic = getMagnetism();
+      wiggle();
+    }
+    Enes100.print("The signal is: ");
+    Enes100.println(signal);
+    if (magnetic){
+      Enes100.print("The puck was magnetic");
+    } else {
+      Enes100.print("The puck was not magnetic");
+    }
+    raiseArm(-50);
     */
     
     //ULTRA SONIC TEST
@@ -137,7 +167,7 @@ void loop() {
 
     //This portion of code drops the arm and collects the data
     
-    dropArm(PI/2); //idk what angle to put here
+    raiseArm(60); //idk what angle to put here
     double signal;
     boolean magnetic;
     while (getSignal() < .3){
@@ -152,7 +182,7 @@ void loop() {
     } else {
       Enes100.print("The puck was not magnetic");
     }
-    raiseArm();
+    raiseArm(-60);
   
     //This portion of code sets up the vehicle to start checking each lane.
     
@@ -272,8 +302,10 @@ void turn(double turnAngle, boolean turningLeft) {
   }
 }
 
-boolean raiseArm(int armAngle) {  //We might want to condense these 2 into one function by adding a boolean condition for dropping or raising
-  servo.write(armAngle);
+void raiseArm(double armAngle) {  //We might want to condense these 2 into one function by adding a boolean condition for dropping or raising
+  myServo.write(armAngle/2);
+  delay(250);
+  myServo.write(armAngle/2);
 }
 
 double getObstacleDistance() {
@@ -317,7 +349,7 @@ boolean atMissionSite() {
 }
 
 double getSignal() {
-  return (((double) analogRead(SIGNAL_PIN)) / 1023); //gives circuit value from 0-1
+  return (((double) analogRead(SIGNAL_PIN)) / 1023)/2; //gives circuit value from 0-1
 }
 
 double getMagnetism() {
@@ -332,10 +364,4 @@ double getMagnetism() {
 void wiggle() {
    driveReverse(.025); 
    delay(250); //Wait 1/4 of a second
-}
-
-void dance() {
-  while(true){
-    delay(100);
-  }
 }
