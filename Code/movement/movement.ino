@@ -70,18 +70,31 @@ void loop() {
     // Update the OSV's current location
 
     //START OF TESTING CODE
-
+    /*
     delay(10000); //gives us time to get to the arena
     Enes100.println("Half way to starting");
     delay(10000); 
     Enes100.println("Starting now");
+    */
 
+    //LOG TEST
+    /*
+    delay(5000);
+    digitalWrite(LEFT_MOTOR_PIN1, HIGH);
+    digitalWrite(LEFT_MOTOR_PIN2, LOW);
+
+    digitalWrite(RIGHT_MOTOR_PIN1, HIGH);
+    digitalWrite(RIGHT_MOTOR_PIN2, LOW);
+    */
+    
     //SERVO TEST
     /*
-    raiseArm(-50);
+    raiseArm(0);
+    delay(1000);
+    raiseArm(10);
     Serial.println("Moved");
     delay(1000);
-    raiseArm(50);
+    raiseArm(0);
     Serial.println("Moved");
     delay(1000);
     */
@@ -103,7 +116,7 @@ void loop() {
 
     //COMPLETE ARM TEST (Starting at mission site)
     /*
-    raiseArm(50); //idk what angle to put here
+    raiseArm(5); //idk what angle to put here
     double signal;
     boolean magnetic;
     while (getSignal() < .3){
@@ -150,9 +163,8 @@ void loop() {
     */
 
     //START OF ACTUAL MISSION
-    
-    //This portion of code determines starting side and gets us to the mission site.
     /*
+    //This portion of code determines starting side and gets us to the mission site.
     startingPosition = getStartingSide();
     if (startingPosition) {
       turn(-PI/2,LEFT); //Current direction of turning is arbitrary, create method of determining later.
@@ -167,7 +179,7 @@ void loop() {
 
     //This portion of code drops the arm and collects the data
     
-    raiseArm(60); //idk what angle to put here
+    raiseArm(10); //idk what angle to put here
     double signal;
     boolean magnetic;
     while (getSignal() < .3){
@@ -182,7 +194,7 @@ void loop() {
     } else {
       Enes100.print("The puck was not magnetic");
     }
-    raiseArm(-60);
+    raiseArm(0);
   
     //This portion of code sets up the vehicle to start checking each lane.
     
@@ -303,9 +315,11 @@ void turn(double turnAngle, boolean turningLeft) {
 }
 
 void raiseArm(double armAngle) {  //We might want to condense these 2 into one function by adding a boolean condition for dropping or raising
-  myServo.write(armAngle/2);
-  delay(250);
-  myServo.write(armAngle/2);
+  int val = 10;
+  for (int i = 0; i < val; i++) {
+      myServo.write(armAngle/val);
+      delay(1000/val);  
+  }
 }
 
 double getObstacleDistance() {
@@ -324,12 +338,6 @@ double getObstacleDistance() {
 //Top is true, bottom is false
 boolean getStartingSide() {
   resetLocation();
-/*  if (yPos > 1) { //ASSUMING 0,0 is bottom left of arena
-    return true;
-  } else {
-    return false;
-  }*/
-
   return (yPos > 1);
 }
 
@@ -353,11 +361,7 @@ double getSignal() {
 }
 
 double getMagnetism() {
-  if (digitalRead(MAGNET_PIN) == HIGH) {
-    return true;
-  } else {
-    return false;
-  }
+  return (digitalRead(MAGNET_PIN) == HIGH);
 }
 
 // Might need a lot of thinking, probably just drive backwards tiny amount
