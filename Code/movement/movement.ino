@@ -20,9 +20,11 @@
 
     //analog pins
 
-    int SIGNAL_PIN = A0;
+    int SIGNAL_PIN = 9;
     
     //other
+    float pwm_value = 0;
+    double num = 0.0;
 
     double duration;
     double ultraDistance;
@@ -77,29 +79,57 @@ void loop() {
     Enes100.println("Starting now");
     */
 
-    //LOG TEST
+    //NAVIGATE MISSION TEST
     /*
-    delay(5000);
+    if (resetLocation() == false) {
+      // emergency reverse
+      Enes100.println("BRUH HOW OUT OF AREANNA");
+      Enes100.println("WRITE THIS LATER, PROLLY BACKUP OSV");
+      delay(1000);
+    } else {
+       Enes100.updateLocation();
+       Enes100.println("Location found");  //DELETE LATER 
+       Enes100.print("x Position is: ");
+       Enes100.println(xPos);
+       Enes100.print("y Position is: ");
+       Enes100.println(yPos);
+       Enes100.print("Current angle is: ");
+       Enes100.println(angle);
+       delay(1000);
+    }
+    
+    Enes100.println("7 seconds until start");
+    delay(7500);
+    Enes100.println("Starting now");
+    driveForwards(.2);
+    Enes100.updateLocation();
+       Enes100.println("Location found");  //DELETE LATER 
+       Enes100.print("x Position is: ");
+       Enes100.println(xPos);
+       Enes100.print("y Position is: ");
+       Enes100.println(yPos);
+       Enes100.print("Current angle is: ");
+       Enes100.println(angle);
+       delay(1000);
+    delay(500);
+    raiseArm(5);
+    */
+
+    //LIMBO TEST
+    /*
+    delay(15000);
+    Serial.println("Moving now");
     digitalWrite(LEFT_MOTOR_PIN1, HIGH);
     digitalWrite(LEFT_MOTOR_PIN2, LOW);
 
     digitalWrite(RIGHT_MOTOR_PIN1, HIGH);
     digitalWrite(RIGHT_MOTOR_PIN2, LOW);
-    delay(10000);
-    digitalWrite(LEFT_MOTOR_PIN1, LOW);
-    digitalWrite(LEFT_MOTOR_PIN2, LOW);
-
-    digitalWrite(RIGHT_MOTOR_PIN1, LOW);
-    digitalWrite(RIGHT_MOTOR_PIN2, LOW);
-    while(true){
-      delay(1000);
-    }
     */
     
     //SERVO TEST
-
+    /*
     delay(3000);
-    raiseArm(30);
+    raiseArm(10);
     Serial.println("Moved");
     delay(1000);
     raiseArm(0);
@@ -108,7 +138,7 @@ void loop() {
     raiseArm(10);
     Serial.println("Moved");
     delay(1000);
-    
+    */
 
     //MOVEMENT FUNCTIONS TEST
     /*
@@ -118,12 +148,35 @@ void loop() {
     driveReverse(1);
     */
 
-    //SIGNAL TEST
+    //SIGNAL TEST (ADD TO FUNCTION LATER)
+    /*
+    pwm_value = pulseIn(SIGNAL_PIN, HIGH);
+
+    num = round(pwm_value / 1000.0);
+    Serial.println("Duty Cycle: ");
+    Serial.println((int) num);
+    delay(1000);
+    */
     /*
     Enes100.println("Signal is: ");
     Enes100.println(getSignal());
+    Serial.println("Signal is: ");
+    Serial.println(getSignal());
     delay(500);
     */
+
+    //MAGNET TEST
+    /*
+    boolean magnetic = getMagnetism();
+    if (magnetic){
+      Enes100.println("The puck was magnetic");
+      Serial.println("The puck was magnetic");
+    } else {
+      Enes100.println("The puck was not magnetic");
+      Serial.println("The puck was not magnetic");
+    }
+    delay(1000);
+    8?
 
     //COMPLETE ARM TEST (Starting at mission site)
     /*
@@ -174,7 +227,7 @@ void loop() {
     */
 
     //START OF ACTUAL MISSION
-    /*
+    
     //This portion of code determines starting side and gets us to the mission site.
     startingPosition = getStartingSide();
     if (startingPosition) {
@@ -257,7 +310,7 @@ void loop() {
     driveForwards(.7);
 
     //We should be over the finish line now
-    */
+    
 }
 
 
@@ -283,6 +336,11 @@ void driveForwards(double distance) {
     digitalWrite(RIGHT_MOTOR_PIN2, LOW);
     resetLocation();
   }
+  digitalWrite(LEFT_MOTOR_PIN1, LOW);
+  digitalWrite(LEFT_MOTOR_PIN2, LOW);
+
+  digitalWrite(RIGHT_MOTOR_PIN1, LOW);
+  digitalWrite(RIGHT_MOTOR_PIN2, LOW);
 }
 
 void driveReverse(double distance) {
@@ -299,37 +357,76 @@ void driveReverse(double distance) {
     digitalWrite(RIGHT_MOTOR_PIN2, HIGH);
     resetLocation();
   }
+  digitalWrite(LEFT_MOTOR_PIN1, LOW);
+  digitalWrite(LEFT_MOTOR_PIN2, LOW);
+
+  digitalWrite(RIGHT_MOTOR_PIN1, LOW);
+  digitalWrite(RIGHT_MOTOR_PIN2, LOW);
 }
 
 //Left is true, right is false
 void turn(double turnAngle, boolean turningLeft) {
   //(angle < PI) ? angle : angle - (2PI)
   resetLocation();
-  while (angle > turnAngle + .01 || angle < turnAngle - .01) { //Current margin of error is arbitrary, adjust later
-    if (turningLeft) {
-      //Right wheels drive forward, left wheels drive backwards
-      digitalWrite(LEFT_MOTOR_PIN1, LOW);
-      digitalWrite(LEFT_MOTOR_PIN2, HIGH);
+  Enes100.print("Our angle is: ");
+  Enes100.println(angle);
+  Enes100.print("Our desired angle is: ");
+  Enes100.println(turnAngle);
+  Enes100.print("x-val: ");
+  Enes100.println(xPos);
+  Enes100.print("y-val: ");
+  Enes100.println(yPos);
+  if(turnAngle > 0){
+    while (!(angle < turnAngle - .02) && !(angle > turnAngle + .02)) { //Current margin of error is arbitrary, adjust later
+      if (turningLeft) {
+        //Right wheels drive forward, left wheels drive backwards
+        digitalWrite(LEFT_MOTOR_PIN1, LOW);
+        digitalWrite(LEFT_MOTOR_PIN2, HIGH);
 
-      digitalWrite(RIGHT_MOTOR_PIN1, HIGH);
-      digitalWrite(RIGHT_MOTOR_PIN2, LOW);
-    } else {
-      //Left wheels drive forward, right wheels drive backwards
-      digitalWrite(LEFT_MOTOR_PIN1, HIGH);
-      digitalWrite(LEFT_MOTOR_PIN2, LOW);
+        digitalWrite(RIGHT_MOTOR_PIN1, HIGH);
+        digitalWrite(RIGHT_MOTOR_PIN2, LOW);
+      } else {
+        //Left wheels drive forward, right wheels drive backwards
+        digitalWrite(LEFT_MOTOR_PIN1, HIGH);
+        digitalWrite(LEFT_MOTOR_PIN2, LOW);
 
-      digitalWrite(RIGHT_MOTOR_PIN1, LOW);
-      digitalWrite(RIGHT_MOTOR_PIN2, HIGH);
+        digitalWrite(RIGHT_MOTOR_PIN1, LOW);
+        digitalWrite(RIGHT_MOTOR_PIN2, HIGH);
+      }
+      resetLocation();
     }
-    resetLocation();
+  } else {
+    while (!(angle > turnAngle - .02) && !(angle < turnAngle + .02)) { //Current margin of error is arbitrary, adjust later
+      if (turningLeft) {
+        //Right wheels drive forward, left wheels drive backwards
+        digitalWrite(LEFT_MOTOR_PIN1, LOW);
+        digitalWrite(LEFT_MOTOR_PIN2, HIGH);
+
+        digitalWrite(RIGHT_MOTOR_PIN1, HIGH);
+        digitalWrite(RIGHT_MOTOR_PIN2, LOW);
+      } else {
+        //Left wheels drive forward, right wheels drive backwards
+        digitalWrite(LEFT_MOTOR_PIN1, HIGH);
+        digitalWrite(LEFT_MOTOR_PIN2, LOW);
+
+        digitalWrite(RIGHT_MOTOR_PIN1, LOW);
+        digitalWrite(RIGHT_MOTOR_PIN2, HIGH);
+      }
+      resetLocation();
+    }
   }
+  digitalWrite(LEFT_MOTOR_PIN1, LOW);
+  digitalWrite(LEFT_MOTOR_PIN2, LOW);
+
+  digitalWrite(RIGHT_MOTOR_PIN1, LOW);
+  digitalWrite(RIGHT_MOTOR_PIN2, LOW);
 }
 
 void raiseArm(double armAngle) {  //We might want to condense these 2 into one function by adding a boolean condition for dropping or raising
   int val = 10;
   for (int i = 0; i < val; i++) {
       myServo.write(armAngle/val);
-      delay(1000/val);  
+      delay(5000/val);  
   }
 }
 
@@ -368,11 +465,24 @@ boolean atMissionSite() {
 }
 
 double getSignal() {
-  return (((double) analogRead(SIGNAL_PIN)) / 1023)/2; //gives circuit value from 0-1
+  double signalValue = 0;
+  for(int i = 0; i < 1000; i++){
+    if(signalValue < (((double) analogRead(A0)) / 1023)) {
+      signalValue = (((double) analogRead(A0)) / 1023) / 2; //gives circuit value from 0-1
+    }
+    delay(1);
+  }
+  return signalValue;
 }
 
-double getMagnetism() {
-  return (digitalRead(MAGNET_PIN) == HIGH);
+boolean getMagnetism() {
+  int proximity = digitalRead(MAGNET_PIN);
+  if (proximity == LOW){ // If the pin reads low, the switch is closed.
+    return true;
+  } else {
+    return false;
+  }
+  //return (digitalRead(MAGNET_PIN) == HIGH);
 }
 
 // Might need a lot of thinking, probably just drive backwards tiny amount
