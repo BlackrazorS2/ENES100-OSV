@@ -12,7 +12,7 @@
 
     int TX_PIN = 12;
     int RX_PIN = 13;
-    int SERVO_PIN = 9;
+    int SERVO_PIN = 11;
     int LEFT_MOTOR_PIN1 = 2, LEFT_MOTOR_PIN2 = 3;
     int RIGHT_MOTOR_PIN1 = 4, RIGHT_MOTOR_PIN2 = 5;
     int ULTRA_SONIC_PWM = 6, ULTRA_SONIC_PIN2 = 7;
@@ -85,19 +85,30 @@ void loop() {
 
     digitalWrite(RIGHT_MOTOR_PIN1, HIGH);
     digitalWrite(RIGHT_MOTOR_PIN2, LOW);
+    delay(10000);
+    digitalWrite(LEFT_MOTOR_PIN1, LOW);
+    digitalWrite(LEFT_MOTOR_PIN2, LOW);
+
+    digitalWrite(RIGHT_MOTOR_PIN1, LOW);
+    digitalWrite(RIGHT_MOTOR_PIN2, LOW);
+    while(true){
+      delay(1000);
+    }
     */
     
     //SERVO TEST
-    /*
+
+    delay(3000);
+    raiseArm(30);
+    Serial.println("Moved");
+    delay(1000);
     raiseArm(0);
+    Serial.println("Moved");
     delay(1000);
     raiseArm(10);
     Serial.println("Moved");
     delay(1000);
-    raiseArm(0);
-    Serial.println("Moved");
-    delay(1000);
-    */
+    
 
     //MOVEMENT FUNCTIONS TEST
     /*
@@ -131,7 +142,7 @@ void loop() {
     } else {
       Enes100.print("The puck was not magnetic");
     }
-    raiseArm(-50);
+    raiseArm(-5);
     */
     
     //ULTRA SONIC TEST
