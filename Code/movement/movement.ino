@@ -166,17 +166,19 @@ void loop() {
     */
 
     //MAGNET TEST
-    /*
+    
     boolean magnetic = getMagnetism();
     if (magnetic){
       Enes100.println("The puck was magnetic");
       Serial.println("The puck was magnetic");
+      Enes100.mission(MAGNETISM, true);
     } else {
       Enes100.println("The puck was not magnetic");
       Serial.println("The puck was not magnetic");
+      Enes100.mission(MAGNETISM, false);
     }
     delay(1000);
-    8?
+    
 
     //COMPLETE ARM TEST (Starting at mission site)
     /*
@@ -197,6 +199,7 @@ void loop() {
     }
     raiseArm(-5);
     */
+    
     
     //ULTRA SONIC TEST
 
@@ -226,6 +229,7 @@ void loop() {
     }
     */
 
+/*
     //START OF ACTUAL MISSION
     
     //This portion of code determines starting side and gets us to the mission site.
@@ -310,7 +314,7 @@ void loop() {
     driveForwards(.7);
 
     //We should be over the finish line now
-    
+    */
 }
 
 
