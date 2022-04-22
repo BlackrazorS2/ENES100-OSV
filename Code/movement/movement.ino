@@ -48,7 +48,7 @@ void setup() {
     //Inputs
 
     pinMode(MAGNET_PIN, INPUT);
-    pinMode(SIGNAL_PIN, INPUT);
+    pinMode(SIGNAL_PIN, OUTPUT);
     pinMode(ULTRA_SONIC_PIN2, INPUT);
 
     myServo.attach(SERVO_PIN);
@@ -149,22 +149,23 @@ void loop() {
     */
 
     //SIGNAL TEST (ADD TO FUNCTION LATER)
-    /*
+    
     pwm_value = pulseIn(SIGNAL_PIN, HIGH);
 
     num = round(pwm_value / 1000.0);
     Serial.println("Duty Cycle: ");
     Serial.println((int) num);
     delay(1000);
-    */
-    /*
-    Enes100.println("Signal is: ");
-    Enes100.println(getSignal());
-    Serial.println("Signal is: ");
-    Serial.println(getSignal());
-    delay(500);
-    */
+    
+    
+//    Enes100.println("Signal is: ");
+//    Enes100.println(getSignal());
+//    Serial.println("Signal is: ");
+//    Serial.println(getSignal());
+//    delay(500);
+    
 
+    /*
     //MAGNET TEST
     
     boolean magnetic = getMagnetism();
@@ -178,7 +179,7 @@ void loop() {
       Enes100.mission(MAGNETISM, false);
     }
     delay(1000);
-    
+    */
 
     //COMPLETE ARM TEST (Starting at mission site)
     /*
