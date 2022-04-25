@@ -44,6 +44,7 @@ void setup() {
     // Team Name, Mission Type, Marker ID, TX Pin, RX Pin
     
     Enes100.begin("Frostbytes", DATA, MARKER_ID, TX_PIN, RX_PIN);
+    delay(200);
 
     //Inputs
 
@@ -67,17 +68,15 @@ void setup() {
 }
 
 void loop() {
-
+    /*
+    Enes100.println("Starting in 5 seconds");
+    delay(5000);
+    Enes100.println("Starting!");
+    */
 
     // Update the OSV's current location
 
     //START OF TESTING CODE
-    /*
-    delay(10000); //gives us time to get to the arena
-    Enes100.println("Half way to starting");
-    delay(10000); 
-    Enes100.println("Starting now");
-    */
 
     //NAVIGATE MISSION TEST
     /*
@@ -142,14 +141,36 @@ void loop() {
 
     //MOVEMENT FUNCTIONS TEST
     /*
-    driveForwards(1);
-    turn(PI/2, LEFT);
-    turn(0, RIGHT);
-    driveReverse(1);
+    if (resetLocation() == false) {
+      // emergency reverse
+      Enes100.println("BRUH HOW OUT OF AREANNA");
+      Enes100.println("WRITE THIS LATER, PROLLY BACKUP OSV");
+      delay(1000);
+    } else {
+       Enes100.updateLocation();
+       Enes100.println("Location found");  //DELETE LATER 
+       Enes100.print("x Position is: ");
+       Enes100.println(xPos);
+       Enes100.print("y Position is: ");
+       Enes100.println(yPos);
+       Enes100.print("Current angle is: ");
+       Enes100.println(angle);
+       delay(1000);
+
+       Enes100.println("Driving forwards");
+       driveForwards(1);
+       Enes100.println("Turning left");
+       turn(0, LEFT);
+       Enes100.println("Turning right");
+       turn(PI/2, RIGHT);
+       Enes100.println("Driving backwards");
+       driveReverse(1);
+    }
     */
 
     //SIGNAL TEST (ADD TO FUNCTION LATER)
-    
+
+    /*
     pwm_value = pulseIn(SIGNAL_PIN, HIGH);
 
     num = round(pwm_value / 1000.0);
@@ -163,11 +184,11 @@ void loop() {
 //    Serial.println("Signal is: ");
 //    Serial.println(getSignal());
 //    delay(500);
-    
+    */
 
-    /*
-    //MAGNET TEST
     
+    //MAGNET TEST
+
     boolean magnetic = getMagnetism();
     if (magnetic){
       Enes100.println("The puck was magnetic");
@@ -179,7 +200,7 @@ void loop() {
       Enes100.mission(MAGNETISM, false);
     }
     delay(1000);
-    */
+    
 
     //COMPLETE ARM TEST (Starting at mission site)
     /*
@@ -382,7 +403,7 @@ void turn(double turnAngle, boolean turningLeft) {
   Enes100.print("y-val: ");
   Enes100.println(yPos);
   if(turnAngle > 0){
-    while (!(angle < turnAngle - .02) && !(angle > turnAngle + .02)) { //Current margin of error is arbitrary, adjust later
+    while ((angle < turnAngle - .05) || (angle > turnAngle + .05)) { //Current margin of error is arbitrary, adjust later
       if (turningLeft) {
         //Right wheels drive forward, left wheels drive backwards
         digitalWrite(LEFT_MOTOR_PIN1, LOW);
@@ -401,7 +422,7 @@ void turn(double turnAngle, boolean turningLeft) {
       resetLocation();
     }
   } else {
-    while (!(angle > turnAngle - .02) && !(angle < turnAngle + .02)) { //Current margin of error is arbitrary, adjust later
+    while ((angle > turnAngle - .05) || (angle < turnAngle + .05)) { //Current margin of error is arbitrary, adjust later
       if (turningLeft) {
         //Right wheels drive forward, left wheels drive backwards
         digitalWrite(LEFT_MOTOR_PIN1, LOW);
