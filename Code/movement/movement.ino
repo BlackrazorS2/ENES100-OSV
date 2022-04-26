@@ -42,7 +42,7 @@
 void setup() {
     // Initialize Enes100 Library
     // Team Name, Mission Type, Marker ID, TX Pin, RX Pin
-    
+    delay(200);
     Enes100.begin("Frostbytes", DATA, MARKER_ID, TX_PIN, RX_PIN);
     delay(200);
 
@@ -68,11 +68,11 @@ void setup() {
 }
 
 void loop() {
-    /*
+    
     Enes100.println("Starting in 5 seconds");
     delay(5000);
     Enes100.println("Starting!");
-    */
+    
 
     // Update the OSV's current location
 
@@ -188,7 +188,7 @@ void loop() {
 
     
     //MAGNET TEST
-
+    /*
     boolean magnetic = getMagnetism();
     if (magnetic){
       Enes100.println("The puck was magnetic");
@@ -200,7 +200,7 @@ void loop() {
       Enes100.mission(MAGNETISM, false);
     }
     delay(1000);
-    
+    */
 
     //COMPLETE ARM TEST (Starting at mission site)
     /*
@@ -225,11 +225,13 @@ void loop() {
     
     //ULTRA SONIC TEST
 
-    /*
+    
     Enes100.println("Ultra sonic sensor distance");
     Enes100.println(getObstacleDistance());
+    Serial.println("Ultra sonic sensor distance");
+    Serial.println(getObstacleDistance());
     delay(500);
-    */
+    
     
     //TESTING ARUCO
     /*
@@ -251,9 +253,9 @@ void loop() {
     }
     */
 
-/*
+
     //START OF ACTUAL MISSION
-    
+    /*
     //This portion of code determines starting side and gets us to the mission site.
     startingPosition = getStartingSide();
     if (startingPosition) {
@@ -266,7 +268,7 @@ void loop() {
       driveForwards(.05);
       delay(250);
     }
-
+    
     //This portion of code drops the arm and collects the data
     
     raiseArm(10); //idk what angle to put here
@@ -294,7 +296,7 @@ void loop() {
     } else {
       turn(0,RIGHT);
     }
-
+    
     //This portion of code checks each lane and gets us to the ending area. (CONDENSE LATER)
     
     if (getObstacleDistance() > 2){ //Checks 1st lane
@@ -333,10 +335,11 @@ void loop() {
       driveForwards(.6);
       turn(0,LEFT);
     }
+    /*
     driveForwards(.7);
-
-    //We should be over the finish line now
     */
+    //We should be over the finish line now
+    
 }
 
 
@@ -360,7 +363,9 @@ void driveForwards(double distance) {
 
     digitalWrite(RIGHT_MOTOR_PIN1, HIGH);
     digitalWrite(RIGHT_MOTOR_PIN2, LOW);
-    resetLocation();
+    while(!resetLocation()){
+      resetLocation();
+    }
   }
   digitalWrite(LEFT_MOTOR_PIN1, LOW);
   digitalWrite(LEFT_MOTOR_PIN2, LOW);
@@ -381,7 +386,9 @@ void driveReverse(double distance) {
 
     digitalWrite(RIGHT_MOTOR_PIN1, LOW);
     digitalWrite(RIGHT_MOTOR_PIN2, HIGH);
-    resetLocation();
+    while(!resetLocation()){
+      resetLocation();
+    }
   }
   digitalWrite(LEFT_MOTOR_PIN1, LOW);
   digitalWrite(LEFT_MOTOR_PIN2, LOW);
@@ -402,8 +409,12 @@ void turn(double turnAngle, boolean turningLeft) {
   Enes100.println(xPos);
   Enes100.print("y-val: ");
   Enes100.println(yPos);
-  if(turnAngle > 0){
-    while ((angle < turnAngle - .05) || (angle > turnAngle + .05)) { //Current margin of error is arbitrary, adjust later
+  int i = 0;
+  Enes100.println("i defined");
+  if(turnAngle >= 0){
+    Enes100.println("turnAngle > 0");
+    while ((angle < (turnAngle - .1)) || (angle > (turnAngle + .1))) { //Current margin of error is arbitrary, adjust later
+      Enes100.print("in while");
       if (turningLeft) {
         //Right wheels drive forward, left wheels drive backwards
         digitalWrite(LEFT_MOTOR_PIN1, LOW);
@@ -411,6 +422,10 @@ void turn(double turnAngle, boolean turningLeft) {
 
         digitalWrite(RIGHT_MOTOR_PIN1, HIGH);
         digitalWrite(RIGHT_MOTOR_PIN2, LOW);
+        i++;
+        if ((i % 50) == 0) {
+          Enes100.println(angle);
+        }
       } else {
         //Left wheels drive forward, right wheels drive backwards
         digitalWrite(LEFT_MOTOR_PIN1, HIGH);
@@ -418,18 +433,24 @@ void turn(double turnAngle, boolean turningLeft) {
 
         digitalWrite(RIGHT_MOTOR_PIN1, LOW);
         digitalWrite(RIGHT_MOTOR_PIN2, HIGH);
+        i++;
+        if ((i % 50) == 0) {
+          Enes100.println(angle);
+        }
       }
       resetLocation();
     }
   } else {
-    while ((angle > turnAngle - .05) || (angle < turnAngle + .05)) { //Current margin of error is arbitrary, adjust later
+    while ((angle > (turnAngle - .1)) || (angle < (turnAngle + .1))) { //Current margin of error is arbitrary, adjust later
       if (turningLeft) {
         //Right wheels drive forward, left wheels drive backwards
         digitalWrite(LEFT_MOTOR_PIN1, LOW);
         digitalWrite(LEFT_MOTOR_PIN2, HIGH);
-
+        
         digitalWrite(RIGHT_MOTOR_PIN1, HIGH);
         digitalWrite(RIGHT_MOTOR_PIN2, LOW);
+
+        
       } else {
         //Left wheels drive forward, right wheels drive backwards
         digitalWrite(LEFT_MOTOR_PIN1, HIGH);
@@ -441,11 +462,13 @@ void turn(double turnAngle, boolean turningLeft) {
       resetLocation();
     }
   }
+  Enes100.println("OFF");
   digitalWrite(LEFT_MOTOR_PIN1, LOW);
   digitalWrite(LEFT_MOTOR_PIN2, LOW);
 
   digitalWrite(RIGHT_MOTOR_PIN1, LOW);
   digitalWrite(RIGHT_MOTOR_PIN2, LOW);
+  //break;
 }
 
 void raiseArm(double armAngle) {  //We might want to condense these 2 into one function by adding a boolean condition for dropping or raising
