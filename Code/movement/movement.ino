@@ -68,11 +68,22 @@ void setup() {
 }
 
 void loop() {
-    
-    Enes100.println("Starting in 5 seconds");
-    delay(5000);
+
+    for(int untilStart = 5; untilStart > 0; untilStart--){
+      Enes100.print("Starting in ");
+      Enes100.print(untilStart);
+      Enes100.println(" seconds");
+      delay(1000);
+    }
     Enes100.println("Starting!");
-    
+    Enes100.updateLocation();
+    Enes100.println("Location found");  //DELETE LATER 
+    Enes100.print("x Position is: ");
+    Enes100.println(xPos);
+    Enes100.print("y Position is: ");
+    Enes100.println(yPos);
+    Enes100.print("Current angle is: ");
+    Enes100.println(angle);
 
     // Update the OSV's current location
 
@@ -225,13 +236,13 @@ void loop() {
     
     //ULTRA SONIC TEST
 
-    
+    /*
     Enes100.println("Ultra sonic sensor distance");
     Enes100.println(getObstacleDistance());
     Serial.println("Ultra sonic sensor distance");
     Serial.println(getObstacleDistance());
     delay(500);
-    
+    */
     
     //TESTING ARUCO
     /*
@@ -255,8 +266,9 @@ void loop() {
 
 
     //START OF ACTUAL MISSION
-    /*
+    
     //This portion of code determines starting side and gets us to the mission site.
+    
     startingPosition = getStartingSide();
     if (startingPosition) {
       turn(-PI/2,LEFT); //Current direction of turning is arbitrary, create method of determining later.
@@ -264,13 +276,13 @@ void loop() {
       turn(PI/2,RIGHT);
     }
     driveForwards(.9);
-    while (atMissionSite != false){
+    while (atMissionSite == false){
       driveForwards(.05);
       delay(250);
     }
     
     //This portion of code drops the arm and collects the data
-    
+    /*
     raiseArm(10); //idk what angle to put here
     double signal;
     boolean magnetic;
@@ -287,7 +299,7 @@ void loop() {
       Enes100.print("The puck was not magnetic");
     }
     raiseArm(0);
-  
+  */
     //This portion of code sets up the vehicle to start checking each lane.
     
     driveReverse(1);
@@ -296,23 +308,24 @@ void loop() {
     } else {
       turn(0,RIGHT);
     }
-    
+    driveForwards(.4);
     //This portion of code checks each lane and gets us to the ending area. (CONDENSE LATER)
     
-    if (getObstacleDistance() > 2){ //Checks 1st lane
-      driveForwards(2.8);
+    //checking first row
+    if (getObstacleDistance() > .5){ //Checks 1st lane
+      driveForwards(.7);
     } else {
       if (startingPosition) { //Top is true
        turn(-PI/2,RIGHT);
-        driveForwards(.5);
+        driveForwards(.7);
         turn(0,LEFT);
      } else {
         turn(PI/2,LEFT);
-        driveForwards(.5);
+        driveForwards(.7);
         turn(0,RIGHT);
      }
-      if (getObstacleDistance() > 2){ //Checks 2nd lane
-        driveForwards(2.8);
+      if (getObstacleDistance() > .5){ //Checks 2nd lane
+        driveForwards(.7);
       } else {
         if (startingPosition) { //Top is true
           turn(-PI/2,RIGHT);
@@ -323,17 +336,45 @@ void loop() {
           driveForwards(.5);
           turn(0,RIGHT);
         }
-        driveForwards(2.8); //If we're at the 3rd lane, we assume that it's the clear one
+        driveForwards(.9); //If we're at the 3rd lane, we assume that it's the clear one
+      }
+    }
+    //checking second row
+    if (getObstacleDistance() > .5){ //Checks 1st lane
+      driveForwards(.9);
+    } else {
+      if (startingPosition) { //Top is true
+       turn(PI/2,LEFT);
+        driveForwards(.9);
+        turn(0,RIGHT);
+     } else {
+        turn(-PI/2,RIGHT);
+        driveForwards(.9);
+        turn(0,LEFT);
+     }
+      if (getObstacleDistance() > .5){ //Checks 2nd lane
+        driveForwards(.7);
+      } else {
+        if (startingPosition) { //Top is true
+          turn(PI/2,LEFT);
+          driveForwards(.5);
+          turn(0,RIGHT);
+       } else {
+          turn(-PI/2,RIGHT);
+          driveForwards(.5);
+          turn(0,LEFT);
+        }
+        driveForwards(.9); //If we're at the 3rd lane, we assume that it's the clear one
       }
     }
 
     //This portion of code gets us facing the log and drives over it.
     
     resetLocation();
-    if (yPos > .9) {
-      turn(-PI/2,RIGHT);
+    if (yPos < 1.1) {
+      turn(PI/2,LEFT);
       driveForwards(.6);
-      turn(0,LEFT);
+      turn(0,RIGHT);
     }
     /*
     driveForwards(.7);
@@ -401,20 +442,8 @@ void driveReverse(double distance) {
 void turn(double turnAngle, boolean turningLeft) {
   //(angle < PI) ? angle : angle - (2PI)
   resetLocation();
-  Enes100.print("Our angle is: ");
-  Enes100.println(angle);
-  Enes100.print("Our desired angle is: ");
-  Enes100.println(turnAngle);
-  Enes100.print("x-val: ");
-  Enes100.println(xPos);
-  Enes100.print("y-val: ");
-  Enes100.println(yPos);
-  int i = 0;
-  Enes100.println("i defined");
-  if(turnAngle >= 0){
-    Enes100.println("turnAngle > 0");
-    while ((angle < (turnAngle - .1)) || (angle > (turnAngle + .1))) { //Current margin of error is arbitrary, adjust later
-      Enes100.print("in while");
+  //if(turnAngle >= 0){
+    while ((angle < (turnAngle - .07)) || (angle > (turnAngle + .07))) { //Current margin of error is arbitrary, adjust later
       if (turningLeft) {
         //Right wheels drive forward, left wheels drive backwards
         digitalWrite(LEFT_MOTOR_PIN1, LOW);
@@ -422,10 +451,6 @@ void turn(double turnAngle, boolean turningLeft) {
 
         digitalWrite(RIGHT_MOTOR_PIN1, HIGH);
         digitalWrite(RIGHT_MOTOR_PIN2, LOW);
-        i++;
-        if ((i % 50) == 0) {
-          Enes100.println(angle);
-        }
       } else {
         //Left wheels drive forward, right wheels drive backwards
         digitalWrite(LEFT_MOTOR_PIN1, HIGH);
@@ -433,13 +458,10 @@ void turn(double turnAngle, boolean turningLeft) {
 
         digitalWrite(RIGHT_MOTOR_PIN1, LOW);
         digitalWrite(RIGHT_MOTOR_PIN2, HIGH);
-        i++;
-        if ((i % 50) == 0) {
-          Enes100.println(angle);
-        }
       }
       resetLocation();
     }
+    /*
   } else {
     while ((angle > (turnAngle - .1)) || (angle < (turnAngle + .1))) { //Current margin of error is arbitrary, adjust later
       if (turningLeft) {
@@ -462,6 +484,7 @@ void turn(double turnAngle, boolean turningLeft) {
       resetLocation();
     }
   }
+  */
   Enes100.println("OFF");
   digitalWrite(LEFT_MOTOR_PIN1, LOW);
   digitalWrite(LEFT_MOTOR_PIN2, LOW);
@@ -488,6 +511,7 @@ double getObstacleDistance() {
   duration = pulseIn(ULTRA_SONIC_PIN2, HIGH);
   ultraDistance = duration * 0.034 / 2;
   ultraDistance = ultraDistance / 100;
+  Enes100.println(ultraDistance);
   return ultraDistance;
   
 }
