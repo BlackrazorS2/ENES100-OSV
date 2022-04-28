@@ -42,9 +42,9 @@
 void setup() {
     // Initialize Enes100 Library
     // Team Name, Mission Type, Marker ID, TX Pin, RX Pin
-    delay(200);
+    delay(500);
     Enes100.begin("Frostbytes", DATA, MARKER_ID, TX_PIN, RX_PIN);
-    delay(200);
+    delay(500);
 
     //Inputs
 
@@ -275,15 +275,17 @@ void loop() {
     } else {
       turn(PI/2,RIGHT);
     }
-    driveForwards(.9);
+    driveForwards(.7);
+    
     while (atMissionSite == false){
       driveForwards(.05);
       delay(250);
     }
     
     //This portion of code drops the arm and collects the data
-    /*
-    raiseArm(10); //idk what angle to put here
+    
+    raiseArm(-.7); //idk what angle to put here
+    Serial.println("Past arm");
     double signal;
     boolean magnetic;
     while (getSignal() < .3){
@@ -293,16 +295,20 @@ void loop() {
     }
     Enes100.print("The signal is: ");
     Enes100.println(signal);
+    Serial.print("The signal is: ");
+    Serial.println(signal);
     if (magnetic){
       Enes100.print("The puck was magnetic");
+      Serial.print("The puck was magnetic");
     } else {
       Enes100.print("The puck was not magnetic");
+      Serial.print("The puck was not magnetic");
     }
     raiseArm(0);
-  */
+  
     //This portion of code sets up the vehicle to start checking each lane.
-    
-    driveReverse(1);
+    /*
+    driveReverse(.7);
     if (startingPosition) {
       turn(0,LEFT);
     } else {
@@ -313,7 +319,7 @@ void loop() {
     
     //checking first row
     if (getObstacleDistance() > .5){ //Checks 1st lane
-      driveForwards(.7);
+      driveForwards(.9);
     } else {
       if (startingPosition) { //Top is true
        turn(-PI/2,RIGHT);
@@ -325,15 +331,15 @@ void loop() {
         turn(0,RIGHT);
      }
       if (getObstacleDistance() > .5){ //Checks 2nd lane
-        driveForwards(.7);
+        driveForwards(.9);
       } else {
         if (startingPosition) { //Top is true
           turn(-PI/2,RIGHT);
-          driveForwards(.5);
+          driveForwards(.7);
           turn(0,LEFT);
        } else {
           turn(PI/2,LEFT);
-          driveForwards(.5);
+          driveForwards(.7);
           turn(0,RIGHT);
         }
         driveForwards(.9); //If we're at the 3rd lane, we assume that it's the clear one
@@ -345,29 +351,29 @@ void loop() {
     } else {
       if (startingPosition) { //Top is true
        turn(PI/2,LEFT);
-        driveForwards(.9);
+        driveForwards(.7);
         turn(0,RIGHT);
      } else {
         turn(-PI/2,RIGHT);
-        driveForwards(.9);
+        driveForwards(.7);
         turn(0,LEFT);
      }
       if (getObstacleDistance() > .5){ //Checks 2nd lane
-        driveForwards(.7);
+        driveForwards(.9);
       } else {
         if (startingPosition) { //Top is true
           turn(PI/2,LEFT);
-          driveForwards(.5);
+          driveForwards(.7);
           turn(0,RIGHT);
        } else {
           turn(-PI/2,RIGHT);
-          driveForwards(.5);
+          driveForwards(.7);
           turn(0,LEFT);
         }
         driveForwards(.9); //If we're at the 3rd lane, we assume that it's the clear one
       }
     }
-
+    
     //This portion of code gets us facing the log and drives over it.
     
     resetLocation();
@@ -376,6 +382,7 @@ void loop() {
       driveForwards(.6);
       turn(0,RIGHT);
     }
+    */
     /*
     driveForwards(.7);
     */
@@ -443,7 +450,7 @@ void turn(double turnAngle, boolean turningLeft) {
   //(angle < PI) ? angle : angle - (2PI)
   resetLocation();
   //if(turnAngle >= 0){
-    while ((angle < (turnAngle - .07)) || (angle > (turnAngle + .07))) { //Current margin of error is arbitrary, adjust later
+    while ((angle < (turnAngle - .05)) || (angle > (turnAngle + .05))) { //Current margin of error is arbitrary, adjust later
       if (turningLeft) {
         //Right wheels drive forward, left wheels drive backwards
         digitalWrite(LEFT_MOTOR_PIN1, LOW);
@@ -485,7 +492,7 @@ void turn(double turnAngle, boolean turningLeft) {
     }
   }
   */
-  Enes100.println("OFF");
+  Enes100.println("Stop turning");
   digitalWrite(LEFT_MOTOR_PIN1, LOW);
   digitalWrite(LEFT_MOTOR_PIN2, LOW);
 
@@ -495,10 +502,11 @@ void turn(double turnAngle, boolean turningLeft) {
 }
 
 void raiseArm(double armAngle) {  //We might want to condense these 2 into one function by adding a boolean condition for dropping or raising
-  int val = 10;
+  double val = 10.0;
   for (int i = 0; i < val; i++) {
       myServo.write(armAngle/val);
-      delay(5000/val);  
+      delay(50000/val);  
+      break;
   }
 }
 
@@ -526,18 +534,19 @@ boolean getStartingSide() {
 boolean atMissionSite() {
   resetLocation();
   if (startingPosition) {
-    if (yPos > .5 && yPos < .7) { //Change values after testing aruco marker placement
+    if (yPos > .5 && yPos < .6) { //Change values after testing aruco marker placement
       return true;
     }
   } else {
-    if (yPos > 1.3 && yPos < 1.5) { //Change values after testing aruco marker placement
+    if (yPos > 1.4 && yPos < 1.5) { //Change values after testing aruco marker placement
       return true;
     }
   }
   return false;
 }
 
-double getSignal() {
+int getSignal() {
+  /*
   double signalValue = 0;
   for(int i = 0; i < 1000; i++){
     if(signalValue < (((double) analogRead(A0)) / 1023)) {
@@ -546,6 +555,15 @@ double getSignal() {
     delay(1);
   }
   return signalValue;
+  */
+
+  pwm_value = pulseIn(SIGNAL_PIN, HIGH);
+
+    num = round(pwm_value / 1000.0);
+    Serial.println("Duty Cycle: ");
+    Serial.println((int) num);
+    delay(1000);
+    return((int) num);
 }
 
 boolean getMagnetism() {
