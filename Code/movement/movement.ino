@@ -137,6 +137,8 @@ void loop() {
     */
     
     //SERVO TEST
+
+
     /*
     delay(3000);
     raiseArm(10);
@@ -283,6 +285,8 @@ void loop() {
     }
     
     //This portion of code drops the arm and collects the data
+
+    /*
     
     raiseArm(-.7); //idk what angle to put here
     Serial.println("Past arm");
@@ -305,9 +309,12 @@ void loop() {
       Serial.print("The puck was not magnetic");
     }
     raiseArm(0);
+
+
+    */
   
     //This portion of code sets up the vehicle to start checking each lane.
-    /*
+    
     driveReverse(.7);
     if (startingPosition) {
       turn(0,LEFT);
@@ -382,7 +389,6 @@ void loop() {
       driveForwards(.6);
       turn(0,RIGHT);
     }
-    */
     /*
     driveForwards(.7);
     */
