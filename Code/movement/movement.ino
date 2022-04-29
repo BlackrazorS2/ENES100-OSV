@@ -277,7 +277,7 @@ void loop() {
     }
     driveForwards(.7);
     
-    while (atMissionSite == false){
+    while (atMissionSite() == false){
       driveForwards(.05);
       delay(250);
     }
