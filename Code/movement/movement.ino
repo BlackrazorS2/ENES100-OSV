@@ -21,7 +21,7 @@
     //analog pins
 
     int SIGNAL_PIN = 9;
-    
+
     //other
     float pwm_value = 0;
     double num = 0.0;
@@ -52,8 +52,6 @@ void setup() {
     pinMode(SIGNAL_PIN, OUTPUT);
     pinMode(ULTRA_SONIC_PIN2, INPUT);
 
-    myServo.attach(SERVO_PIN);
-
     //Outputs
     
     pinMode(LEFT_MOTOR_PIN1, OUTPUT);
@@ -68,10 +66,12 @@ void setup() {
 }
 
 void loop() {
+  
   delay(1000);
   for(int i = 0; i < 100; i++){
     resetLocation();
     Enes100.updateLocation();
+    Enes100.println(xPos);
   }
   
     resetLocation();
@@ -103,7 +103,7 @@ void loop() {
     Enes100.print("Current angle is: ");
     Enes100.println(angle);
     // Update the OSV's current location
-
+    
     //START OF TESTING CODE
 
     //NAVIGATE MISSION TEST
@@ -234,22 +234,35 @@ void loop() {
 
     //COMPLETE ARM TEST (Starting at mission site)
     /*
-    raiseArm(5); //idk what angle to put here
+    Serial.println("Starting in 5 seconds");
+    delay(5000);
+    myServo.write(39);
+    Serial.println("Arm Dropped");
     double signal;
     boolean magnetic;
-    while (getSignal() < .3){
+    do {
       signal = getSignal();
       magnetic = getMagnetism();
-      wiggle();
-    }
+      //wiggle();
+    } while(signal <= 0);
+    //potentially remove later
+    signal = signal * 2.5;
+    
     Enes100.print("The signal is: ");
     Enes100.println(signal);
+    Serial.print("The signal is: ");
+    Serial.println(signal);
     if (magnetic){
       Enes100.print("The puck was magnetic");
+      Serial.print("The puck was magnetic");
     } else {
       Enes100.print("The puck was not magnetic");
+      Serial.print("The puck was not magnetic");
     }
-    raiseArm(-5);
+    delay(1000);
+    myServo.write(120);
+    Serial.println("");
+    Serial.println("done");
     */
     
     
@@ -292,7 +305,7 @@ void loop() {
     if (startingPosition) {
       turn(-PI/2,LEFT); //Current direction of turning is arbitrary, create method of determining later.
     } else {
-      turn(PI/2,RIGHT);
+      turn(PI/2,RIGHT);  //RIGHT
     }
     delay(1000);
     driveForwards(.7);
@@ -306,17 +319,18 @@ void loop() {
     
     //This portion of code drops the arm and collects the data
 
-    
-    
-    raiseArm(-.7); //idk what angle to put here
-    Serial.println("Past arm");
+    myServo.attach(SERVO_PIN);
+    delay(5000);
+    myServo.write(39);
+    Serial.println("Arm Dropped");
     double signal;
     boolean magnetic;
-    while (getSignal() < .3){
+    do {
       signal = getSignal();
       magnetic = getMagnetism();
       wiggle();
-    }
+    } while(signal <= 0);
+    
     Enes100.print("The signal is: ");
     Enes100.println(signal);
     Serial.print("The signal is: ");
@@ -328,19 +342,27 @@ void loop() {
       Enes100.print("The puck was not magnetic");
       Serial.print("The puck was not magnetic");
     }
-    raiseArm(.7);
+    delay(1000);
+    myServo.write(120);
+    Serial.println("");
+    Serial.println("done");
 
 
     
   
     //This portion of code sets up the vehicle to start checking each lane.
-    raiseArm(-.7);
+    delay(3000);
+    driveReverse(.6);
     delay(1000);
-    driveReverse(.8);
+    myServo.write(22);
+    delay(2000);
+    driveReverse(.2);
+    myServo.detach();
+    delay(5000);
     if (startingPosition) {
       turn(0,LEFT);
     } else {
-      turn(0,RIGHT);
+      turn(0,RIGHT); //RIGHT
     }
     driveForwards(.6);
     //This portion of code checks each lane and gets us to the ending area. (CONDENSE LATER)
@@ -350,25 +372,25 @@ void loop() {
       driveForwards(.9);
     } else {
       if (startingPosition) { //Top is true
-       turn(-PI/2,RIGHT);
-        driveForwards(.4);
+       turn(-PI/2,RIGHT); //RIGHT
+        driveForwards(.6);
         turn(0,LEFT);
      } else {
         turn(PI/2,LEFT);
-        driveForwards(.4);
-        turn(0,RIGHT);
+        driveForwards(.6);
+        turn(0,RIGHT); //RIGHT
      }
       if (getObstacleDistance() > .5){ //Checks 2nd lane
         driveForwards(.9);
       } else {
         if (startingPosition) { //Top is true
-          turn(-PI/2,RIGHT);
-          driveForwards(.4);
+          turn(-PI/2,RIGHT); //RIGHT
+          driveForwards(.6);
           turn(0,LEFT);
        } else {
           turn(PI/2,LEFT);
-          driveForwards(.4);
-          turn(0,RIGHT);
+          driveForwards(.6);
+          turn(0,RIGHT); //RIGHT
         }
         driveForwards(.9); //If we're at the 3rd lane, we assume that it's the clear one
       }
@@ -380,9 +402,9 @@ void loop() {
       if (startingPosition) { //Top is true
        turn(PI/2,LEFT);
         driveForwards(.4);
-        turn(0,RIGHT);
+        turn(0,RIGHT); //RIGHT
      } else {
-        turn(-PI/2,RIGHT);
+        turn(-PI/2,RIGHT); //RIGHT
         driveForwards(.4);
         turn(0,LEFT);
      }
@@ -392,9 +414,9 @@ void loop() {
         if (startingPosition) { //Top is true
           turn(PI/2,LEFT);
           driveForwards(.4);
-          turn(0,RIGHT);
+          turn(0,RIGHT); //RIGHT
        } else {
-          turn(-PI/2,RIGHT);
+          turn(-PI/2,RIGHT); //RIGHT
           driveForwards(.4);
           turn(0,LEFT);
         }
@@ -408,11 +430,11 @@ void loop() {
     if (yPos < 1.1) {
       turn(PI/2,LEFT);
       driveForwards(.6);
-      turn(0,RIGHT);
+      turn(0,RIGHT); //RIGHT
     }
-    /*
+    myServo.write(25);
     driveForwards(.7);
-    */
+    
     //We should be over the finish line now
     
 }
@@ -423,12 +445,10 @@ boolean resetLocation() {
       xPos = Enes100.location.x;
       yPos = Enes100.location.y;
       angle = Enes100.location.theta;  
-      Enes100.println(xPos);
     }
     xPos = Enes100.location.x;
     yPos = Enes100.location.y;
     angle = Enes100.location.theta;
-    Enes100.println(xPos);
     return true;
 }
 
@@ -480,14 +500,21 @@ void driveReverse(double distance) {
 void turn(double turnAngle, boolean turningLeft) {
   //(angle < PI) ? angle : angle - (2PI)
   resetLocation();
-  //if(turnAngle >= 0){
-    while ((angle < (turnAngle - .03)) || (angle > (turnAngle + .03))) { //Current margin of error is arbitrary, adjust later
+    while ((angle < (turnAngle - .01)) || (angle > (turnAngle + .01))) { //Current margin of error is arbitrary, adjust later
       if (turningLeft) {
         //Right wheels drive forward, left wheels drive backwards
         digitalWrite(LEFT_MOTOR_PIN1, LOW);
         digitalWrite(LEFT_MOTOR_PIN2, HIGH);
 
         digitalWrite(RIGHT_MOTOR_PIN1, HIGH);
+        digitalWrite(RIGHT_MOTOR_PIN2, LOW);
+
+        delay(10);
+
+        digitalWrite(LEFT_MOTOR_PIN1, LOW);
+        digitalWrite(LEFT_MOTOR_PIN2, LOW);
+
+        digitalWrite(RIGHT_MOTOR_PIN1, LOW);
         digitalWrite(RIGHT_MOTOR_PIN2, LOW);
       } else {
         //Left wheels drive forward, right wheels drive backwards
@@ -496,33 +523,17 @@ void turn(double turnAngle, boolean turningLeft) {
 
         digitalWrite(RIGHT_MOTOR_PIN1, LOW);
         digitalWrite(RIGHT_MOTOR_PIN2, HIGH);
-      }
-      resetLocation();
-    }
-    /*
-  } else {
-    while ((angle > (turnAngle - .1)) || (angle < (turnAngle + .1))) { //Current margin of error is arbitrary, adjust later
-      if (turningLeft) {
-        //Right wheels drive forward, left wheels drive backwards
-        digitalWrite(LEFT_MOTOR_PIN1, LOW);
-        digitalWrite(LEFT_MOTOR_PIN2, HIGH);
-        
-        digitalWrite(RIGHT_MOTOR_PIN1, HIGH);
-        digitalWrite(RIGHT_MOTOR_PIN2, LOW);
 
-        
-      } else {
-        //Left wheels drive forward, right wheels drive backwards
-        digitalWrite(LEFT_MOTOR_PIN1, HIGH);
+        delay(10);
+
+        digitalWrite(LEFT_MOTOR_PIN1, LOW);
         digitalWrite(LEFT_MOTOR_PIN2, LOW);
 
         digitalWrite(RIGHT_MOTOR_PIN1, LOW);
-        digitalWrite(RIGHT_MOTOR_PIN2, HIGH);
+        digitalWrite(RIGHT_MOTOR_PIN2, LOW);
       }
       resetLocation();
     }
-  }
-  */
   Enes100.println("Stop turning");
   digitalWrite(LEFT_MOTOR_PIN1, LOW);
   digitalWrite(LEFT_MOTOR_PIN2, LOW);
@@ -532,14 +543,16 @@ void turn(double turnAngle, boolean turningLeft) {
   //break;
 }
 
-void raiseArm(double armAngle) {  //We might want to condense these 2 into one function by adding a boolean condition for dropping or raising
-  double val = 10.0;
-  for (int i = 0; i < val; i++) {
-      myServo.write(armAngle/val);
-      delay(50000/val);  
-      break;
-  }
-}
+/*
+*void raiseArm(double armAngle) {  //We might want to condense these 2 into one function by adding a boolean condition for dropping or raising
+*  double val = 10.0;
+*  for (int i = 0; i < val; i++) {
+*      myServo.write(armAngle/val);
+*      delay(50000/val);  
+*      break;
+*  }
+*}
+*/
 
 double getObstacleDistance() {
   digitalWrite(ULTRA_SONIC_PWM, LOW);
@@ -610,6 +623,16 @@ boolean getMagnetism() {
 
 // Might need a lot of thinking, probably just drive backwards tiny amount
 void wiggle() {
-   driveReverse(.025); 
-   delay(250); //Wait 1/4 of a second
+   digitalWrite(LEFT_MOTOR_PIN1, LOW);
+    digitalWrite(LEFT_MOTOR_PIN2, HIGH);
+
+    digitalWrite(RIGHT_MOTOR_PIN1, LOW);
+    digitalWrite(RIGHT_MOTOR_PIN2, HIGH);
+    delay(125); //Wait 1/8 of a second
+
+    digitalWrite(LEFT_MOTOR_PIN1, LOW);
+    digitalWrite(LEFT_MOTOR_PIN2, LOW);
+
+    digitalWrite(RIGHT_MOTOR_PIN1, LOW);
+    digitalWrite(RIGHT_MOTOR_PIN2, LOW);
 }
