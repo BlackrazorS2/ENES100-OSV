@@ -1,0 +1,43 @@
+Stuff to do for each version of the OSV
+
+V1 - the OSV from MS2 chain and sprocket system, double acrylic arm
+V2 - the OSV from MS2 but 4 motor drive instead of chain and sprocket system
+V3 - same as V2 but single acrylic arm instead of double, instead of arm having 3d print then foam just foam
+V4 - Same as V3 but arm is wood instead of acrylic with frostbytes
+V5 - Aestetic decorations (wood body is white, aruco has the snowflakes, snowflakes on wheels, current arrangement, etc
+	- This is the current iteration of the OSV
+	
+	
+Faceplate stuff:
+	Thinner, make center hole smaller, screw sits on outside
+	
+Need to update desktop to solidworks 2021 instead of 2020
+
+Animation
+	- Putting thing in cup
+	- Going under log
+	- Navigating over uneven terrain??
+	- Would it be possible to get the entire arena cadded?
+	
+Animation play by play (probably not going to work):
+	- Robot in arena
+		- path mate to cup, do cup stuff
+		- back up path mate, turn right (or left)
+		- go forward, over rough terrain
+		- under log, tada
+	- may need to encorporate camera movement to get a better view
+	
+Limbo has a wall facing toward the tables width of 5 in, the side walls that mate with the log have width 60 mm
+
+
+-------------------------------------------------------------------------------------------------------------------
+
+Two animation sections, one where the the OTV goes up and does mission then moves back, then another where it runs the obstacles
+
+These positions are based on the upper left edge of the cutout on the OTV (top left of the V)
+
+Starting position - X = -1516.41mm  Y = 108.09 Z =-731.89
+
+Cup Position - X = -1516.41mm  Y = 108.09 Z = -731.89
+
+First part ends with the front body edge being 232.75mm from the front of the cup
