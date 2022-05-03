@@ -267,13 +267,39 @@ void loop() {
     
     
     //ULTRA SONIC TEST
-
     /*
+    
     Enes100.println("Ultra sonic sensor distance");
     Enes100.println(getObstacleDistance());
     Serial.println("Ultra sonic sensor distance");
     Serial.println(getObstacleDistance());
     delay(500);
+    */
+
+    //ULTRA SONIC WITH MOTORS TEST
+    /*
+    
+    delay(5000);
+    digitalWrite(LEFT_MOTOR_PIN1, HIGH);
+    digitalWrite(LEFT_MOTOR_PIN2, LOW);
+
+    digitalWrite(RIGHT_MOTOR_PIN1, HIGH);
+    digitalWrite(RIGHT_MOTOR_PIN2, LOW);
+    delay(2000);
+    Enes100.println("Ultra sonic sensor distance");
+    Enes100.println(getObstacleDistance());
+    delay(500);
+    Serial.println("Ultra sonic sensor distance");
+    Serial.println(getObstacleDistance());
+    delay(5000);
+    digitalWrite(LEFT_MOTOR_PIN1, LOW);
+    digitalWrite(LEFT_MOTOR_PIN2, LOW);
+
+    digitalWrite(RIGHT_MOTOR_PIN1, LOW);
+    digitalWrite(RIGHT_MOTOR_PIN2, LOW);
+    while(true){
+
+    }
     */
     
     //TESTING ARUCO
@@ -318,16 +344,16 @@ void loop() {
     }
     
     //This portion of code drops the arm and collects the data
-
+    /*
     myServo.attach(SERVO_PIN);
     delay(5000);
-    myServo.write(39);
+    myServo.write(35);
     Serial.println("Arm Dropped");
     double signal;
-    boolean magnetic;
+    boolean magnetic = false;
     do {
       signal = getSignal();
-      magnetic = getMagnetism();
+      magnetic = (magnetic) ? true : getMagnetism();
       wiggle();
     } while(signal <= 0);
     
@@ -344,17 +370,18 @@ void loop() {
     }
     delay(1000);
     myServo.write(120);
-    Serial.println("");
-    Serial.println("done");
-
+    delay(3000);
+    myServo.detach();
+    */
 
     
   
     //This portion of code sets up the vehicle to start checking each lane.
     delay(3000);
     driveReverse(.6);
-    delay(1000);
-    myServo.write(22);
+    myServo.attach(SERVO_PIN);
+    delay(5000);
+    myServo.write(25);
     delay(2000);
     driveReverse(.2);
     myServo.detach();
@@ -364,7 +391,7 @@ void loop() {
     } else {
       turn(0,RIGHT); //RIGHT
     }
-    driveForwards(.6);
+    driveForwards(.5);
     //This portion of code checks each lane and gets us to the ending area. (CONDENSE LATER)
     
     //checking first row
@@ -500,9 +527,8 @@ void driveReverse(double distance) {
 void turn(double turnAngle, boolean turningLeft) {
   //(angle < PI) ? angle : angle - (2PI)
   resetLocation();
-    while ((angle < (turnAngle - .01)) || (angle > (turnAngle + .01))) { //Current margin of error is arbitrary, adjust later
-      if (turningLeft) {
-        //Right wheels drive forward, left wheels drive backwards
+  if(turningLeft){
+    while ((angle < (turnAngle - .01)) || (angle > (turnAngle + .01))) {
         digitalWrite(LEFT_MOTOR_PIN1, LOW);
         digitalWrite(LEFT_MOTOR_PIN2, HIGH);
 
@@ -516,8 +542,10 @@ void turn(double turnAngle, boolean turningLeft) {
 
         digitalWrite(RIGHT_MOTOR_PIN1, LOW);
         digitalWrite(RIGHT_MOTOR_PIN2, LOW);
-      } else {
-        //Left wheels drive forward, right wheels drive backwards
+        resetLocation();
+    }
+  } else {
+    while ((angle < (turnAngle - .02)) || (angle > (turnAngle + .01))) {
         digitalWrite(LEFT_MOTOR_PIN1, HIGH);
         digitalWrite(LEFT_MOTOR_PIN2, LOW);
 
@@ -531,9 +559,9 @@ void turn(double turnAngle, boolean turningLeft) {
 
         digitalWrite(RIGHT_MOTOR_PIN1, LOW);
         digitalWrite(RIGHT_MOTOR_PIN2, LOW);
-      }
-      resetLocation();
+        resetLocation();
     }
+  }
   Enes100.println("Stop turning");
   digitalWrite(LEFT_MOTOR_PIN1, LOW);
   digitalWrite(LEFT_MOTOR_PIN2, LOW);
@@ -579,7 +607,7 @@ boolean getStartingSide() {
 boolean atMissionSite() {
   resetLocation();
   if (startingPosition) {
-    if (yPos > .6 && yPos < .8) { //Change values after testing aruco marker placement
+    if (yPos > .6 && yPos < .85) { //Change values after testing aruco marker placement
       return true;
     }
   } else {
