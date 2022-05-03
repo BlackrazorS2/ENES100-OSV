@@ -383,24 +383,29 @@ void loop() {
     delay(5000);
     myServo.write(25);
     delay(2000);
-    driveReverse(.2);
+    driveReverse(.2); //The two drive Reverse functions set us up in our first lane and don't need to be changed
     myServo.detach();
     delay(5000);
+
+    //ALL .5 is checking ultrasonic distance
+    //ALL .9 is distance to drive forward is lane is clear
+    //ALL .6 is distance to drive (in y-dir) to get to new lane (.4 is also this)
+    
     if (startingPosition) {
       turn(0,LEFT);
     } else {
       turn(0,RIGHT); //RIGHT
     }
-    driveForwards(.5);
+    driveForwards(.5); //This sets us up right next to the first obstacle, dont change
     //This portion of code checks each lane and gets us to the ending area. (CONDENSE LATER)
     
     //checking first row
-    if (getObstacleDistance() > .5){ //Checks 1st lane
-      driveForwards(.9);
+    if (getObstacleDistance() > .5){ //Checks 1st lane     THIS distance is arbitrary and should be changed if swapping to only 1 check
+      driveForwards(.9);  //ARBITRARY DISTANCE TO DRIVE FORWARD, INCREASE IF CHANGING TO CHECK ONE LANE
     } else {
       if (startingPosition) { //Top is true
        turn(-PI/2,RIGHT); //RIGHT
-        driveForwards(.6);
+        driveForwards(.6);  //This distance puts us in the next lane
         turn(0,LEFT);
      } else {
         turn(PI/2,LEFT);
