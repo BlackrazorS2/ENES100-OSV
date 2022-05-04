@@ -344,18 +344,32 @@ void loop() {
     }
     
     //This portion of code drops the arm and collects the data
-    /*
+    
     myServo.attach(SERVO_PIN);
     delay(5000);
     myServo.write(35);
     Serial.println("Arm Dropped");
-    double signal;
+    double signal = -1;
     boolean magnetic = false;
+
+
+// -----    
+// THIS BLOCK WAS MODIFIED TO ENSURE THAT A GUESS IS MADE IN NO READ
+
+    int time = millis();
     do {
       signal = getSignal();
       magnetic = (magnetic) ? true : getMagnetism();
       wiggle();
-    } while(signal <= 0);
+      //DELETE THIS OR RIGHT STATEMENT CRAP IF BAD
+    } while((signal <= 0) || ((millis() - time) > 10000));
+
+    // DELETE IF BREAKS
+    if (signal == -1) {
+      signal = 5; 
+    }
+
+// -----
     
     Enes100.print("The signal is: ");
     Enes100.println(signal);
@@ -372,7 +386,7 @@ void loop() {
     myServo.write(120);
     delay(3000);
     myServo.detach();
-    */
+    
 
     
   
@@ -381,7 +395,7 @@ void loop() {
     driveReverse(.6);
     myServo.attach(SERVO_PIN);
     delay(5000);
-    myServo.write(25);
+    myServo.write(15);
     delay(2000);
     driveReverse(.2); //The two drive Reverse functions set us up in our first lane and don't need to be changed
     myServo.detach();
@@ -390,69 +404,74 @@ void loop() {
     //ALL .5 is checking ultrasonic distance
     //ALL .9 is distance to drive forward is lane is clear
     //ALL .6 is distance to drive (in y-dir) to get to new lane (.4 is also this)
+
+    double CHECKING_ULTRASONIC_DISTANCE = .5;
+    double DRIVE_FORWARD_IS_LANE_CLEAR = .905;
+    double DISTANCE_TO_DRIVE_NEW_LANE = .6;
+
     
     if (startingPosition) {
       turn(0,LEFT);
     } else {
       turn(0,RIGHT); //RIGHT
     }
-    driveForwards(.5); //This sets us up right next to the first obstacle, dont change
+    driveForwards(CHECKING_ULTRASONIC_DISTANCE); //This sets us up right next to the first obstacle, dont change
     //This portion of code checks each lane and gets us to the ending area. (CONDENSE LATER)
     
     //checking first row
-    if (getObstacleDistance() > .5){ //Checks 1st lane     THIS distance is arbitrary and should be changed if swapping to only 1 check
-      driveForwards(.9);  //ARBITRARY DISTANCE TO DRIVE FORWARD, INCREASE IF CHANGING TO CHECK ONE LANE
+    if (getObstacleDistance() > CHECKING_ULTRASONIC_DISTANCE){ //Checks 1st lane     THIS distance is arbitrary and should be changed if swapping to only 1 check
+      driveForwards(DRIVE_FORWARD_IS_LANE_CLEAR);  //ARBITRARY DISTANCE TO DRIVE FORWARD, INCREASE IF CHANGING TO CHECK ONE LANE
     } else {
       if (startingPosition) { //Top is true
        turn(-PI/2,RIGHT); //RIGHT
-        driveForwards(.6);  //This distance puts us in the next lane
+        driveForwards(DISTANCE_TO_DRIVE_NEW_LANE);  //This distance puts us in the next lane
         turn(0,LEFT);
      } else {
         turn(PI/2,LEFT);
-        driveForwards(.6);
+        driveForwards(DISTANCE_TO_DRIVE_NEW_LANE);
         turn(0,RIGHT); //RIGHT
      }
-      if (getObstacleDistance() > .5){ //Checks 2nd lane
-        driveForwards(.9);
+      if (getObstacleDistance() > CHECKING_ULTRASONIC_DISTANCE){ //Checks 2nd lane
+        driveForwards(DRIVE_FORWARD_IS_LANE_CLEAR);
       } else {
         if (startingPosition) { //Top is true
           turn(-PI/2,RIGHT); //RIGHT
-          driveForwards(.6);
+          driveForwards(DISTANCE_TO_DRIVE_NEW_LANE);
           turn(0,LEFT);
        } else {
           turn(PI/2,LEFT);
-          driveForwards(.6);
+          driveForwards(DISTANCE_TO_DRIVE_NEW_LANE);
           turn(0,RIGHT); //RIGHT
         }
-        driveForwards(.9); //If we're at the 3rd lane, we assume that it's the clear one
+        driveForwards(DRIVE_FORWARD_IS_LANE_CLEAR); //If we're at the 3rd lane, we assume that it's the clear one
       }
     }
     //checking second row
-    if (getObstacleDistance() > .5){ //Checks 1st lane
-      driveForwards(.9);
+    if (getObstacleDistance() > CHECKING_ULTRASONIC_DISTANCE){ //Checks 1st lane
+      driveForwards(DRIVE_FORWARD_IS_LANE_CLEAR);
     } else {
       if (startingPosition) { //Top is true
        turn(PI/2,LEFT);
-        driveForwards(.4);
+        driveForwards(1-DISTANCE_TO_DRIVE_NEW_LANE);
         turn(0,RIGHT); //RIGHT
      } else {
         turn(-PI/2,RIGHT); //RIGHT
-        driveForwards(.4);
+        driveForwards(1-DISTANCE_TO_DRIVE_NEW_LANE);
         turn(0,LEFT);
      }
-      if (getObstacleDistance() > .5){ //Checks 2nd lane
-        driveForwards(.9);
+      if (getObstacleDistance() > CHECKING_ULTRASONIC_DISTANCE){ //Checks 2nd lane
+        driveForwards(DRIVE_FORWARD_IS_LANE_CLEAR);
       } else {
         if (startingPosition) { //Top is true
           turn(PI/2,LEFT);
-          driveForwards(.4);
+          driveForwards(1-DISTANCE_TO_DRIVE_NEW_LANE);
           turn(0,RIGHT); //RIGHT
        } else {
           turn(-PI/2,RIGHT); //RIGHT
-          driveForwards(.4);
+          driveForwards(1-DISTANCE_TO_DRIVE_NEW_LANE);
           turn(0,LEFT);
         }
-        driveForwards(.9); //If we're at the 3rd lane, we assume that it's the clear one
+        driveForwards(DRIVE_FORWARD_IS_LANE_CLEAR); //If we're at the 3rd lane, we assume that it's the clear one
       }
     }
     
@@ -550,7 +569,7 @@ void turn(double turnAngle, boolean turningLeft) {
         resetLocation();
     }
   } else {
-    while ((angle < (turnAngle - .02)) || (angle > (turnAngle + .01))) {
+    while ((angle < (turnAngle - .01)) || (angle > (turnAngle + .01))) {
         digitalWrite(LEFT_MOTOR_PIN1, HIGH);
         digitalWrite(LEFT_MOTOR_PIN2, LOW);
 
@@ -612,11 +631,13 @@ boolean getStartingSide() {
 boolean atMissionSite() {
   resetLocation();
   if (startingPosition) {
-    if (yPos > .6 && yPos < .85) { //Change values after testing aruco marker placement
+    if (yPos > .7 && yPos < .85) { //Change values after testing aruco marker placement
+      // FORMERLY yPos > .6 && yPos < .85
       return true;
     }
   } else {
-    if (yPos > 1.15 && yPos < 1.4) { //Change values after testing aruco marker placement
+    if (yPos > 1.2 && yPos < 1.4) { //Change values after testing aruco marker placement
+      // FORMERLY yPos > 1.15 && yPos < 1.4
       return true;
     }
   }
