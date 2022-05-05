@@ -68,7 +68,7 @@ void setup() {
 void loop() {
   
   delay(1000);
-  for(int i = 0; i < 100; i++){
+  for(int i = 0; i < 30; i++){
     resetLocation();
     Enes100.updateLocation();
     Enes100.println(xPos);
@@ -286,7 +286,7 @@ void loop() {
       //DELETE THIS OR RIGHT STATEMENT CRAP IF BAD
     } while((signal <= 0) && ((millis() - time) < 20000));
 
-    // DELETE IF BREAKS
+    // DELETE IF NO WORK
     if (signal <= 0) {
       signal = 5; 
     }
@@ -406,7 +406,7 @@ void loop() {
 
 // -----    
 // THIS BLOCK WAS MODIFIED TO ENSURE THAT A GUESS IS MADE IN NO READ
-
+    
     do {
       signal = getSignal();
       magnetic = (magnetic) ? true : getMagnetism();
@@ -416,10 +416,11 @@ void loop() {
     } while((signal <= 0) && yPos > 1.1);
 
     // DELETE IF IT DOESNT WORK
+    
     if (signal < -.5) {
       signal = 5; 
     }
-
+    
 // -----
     
     Enes100.print("The signal is: ");
@@ -440,7 +441,6 @@ void loop() {
     delay(1000);
     myServo.write(120);
     delay(3000);
-    myServo.detach();
     
 
     
@@ -448,6 +448,8 @@ void loop() {
     //This portion of code sets up the vehicle to start checking each lane.
     delay(3000);
     driveReverse(.9);
+    myServo.write(25);
+    myServo.detach();
     delay(5000);
 
     //ALL .5 is checking ultrasonic distance
@@ -534,11 +536,12 @@ void loop() {
       driveForwards(.6);
       turn(0,RIGHT); //RIGHT
     }
-    /*
+    
     myServo.attach(SERVO_PIN);
     delay(3000);
     myServo.write(25);
-    */
+    delay(2000);
+    myServo.detach();
     driveForwards(.7);
     
     //We should be over the finish line now
