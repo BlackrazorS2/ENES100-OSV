@@ -104,6 +104,10 @@ void loop() {
     Enes100.println(angle);
     // Update the OSV's current location
     
+
+
+
+    //////////////////////////////
     //START OF TESTING CODE
 
     //NAVIGATE MISSION TEST
@@ -278,13 +282,12 @@ void loop() {
 // -----    
 // THIS BLOCK WAS MODIFIED TO ENSURE THAT A GUESS IS MADE IN NO READ
 
-    int time = millis();
     do {
       signal = getSignal();
       magnetic = (magnetic) ? true : getMagnetism();
       wiggle();
       //DELETE THIS OR RIGHT STATEMENT CRAP IF BAD
-    } while((signal <= 0) && ((millis() - time) < 20000));
+    } while((signal <= 0));
 
     // DELETE IF NO WORK
     if (signal <= 0) {
@@ -370,34 +373,30 @@ void loop() {
     }
     */
 
-
+    /////////////////////////////////
     //START OF ACTUAL MISSION
     
     //This portion of code determines starting side and gets us to the mission site.
-    myServo.attach(SERVO_PIN);
-    myServo.detach();
     startingPosition = getStartingSide();
     if (startingPosition) {
-      turn(-PI/2,LEFT); //Current direction of turning is arbitrary, create method of determining later.
+      turn(-PI/2 + .01,LEFT); //Current direction of turning is arbitrary, create method of determining later.
     } else {
-      turn(PI/2,RIGHT);  //RIGHT
+      turn(PI/2 - .01,RIGHT);  //RIGHT
     }
     delay(1000);
-    driveForwards(.7);
+    driveForwards(.75);
     
     while (atMissionSite() == false){
       driveForwards(.05);
-      Enes100.println("yPos:");
-      Enes100.println(yPos);
       delay(250);
     }
-    
+    delay(2000);
     //This portion of code drops the arm and collects the data
     
-    myServo.attach(SERVO_PIN);
-    delay(5000);
-    myServo.write(80);
-    myServo.write(35);
+    //myServo.attach(SERVO_PIN);
+    //delay(5000);
+    //myServo.write(80);
+    //myServo.write(35);
     Serial.println("Arm Dropped");
     Enes100.println("Arm Dropped");
     double signal = -1;
@@ -413,9 +412,6 @@ void loop() {
       wiggle();
       //DELETE THIS OR RIGHT STATEMENT CRAP IF BAD
       Enes100.println("WHILE RAN");
-      if(signal == null){
-        signal = 0.0;
-      }
     } while((signal <= 0) && yPos > 1.1);
 
     // DELETE IF IT DOESNT WORK
@@ -442,18 +438,14 @@ void loop() {
       //Enes100.mission(MAGNETISM, NOT_MAGNETIC);
     }
     delay(1000);
-    myServo.write(120);
-    delay(3000);
-    
-
+    //myServo.write(120);
     
   
     //This portion of code sets up the vehicle to start checking each lane.
-    delay(3000);
+    
     driveReverse(.9);
-    myServo.write(25);
-    myServo.detach();
-    delay(5000);
+    //myServo.write(25);
+    //myServo.detach();
 
     //ALL .5 is checking ultrasonic distance
     //ALL .9 is distance to drive forward is lane is clear
@@ -469,6 +461,22 @@ void loop() {
     } else {
       turn(0,RIGHT); //RIGHT
     }
+    while(xPos < 1){
+      digitalWrite(LEFT_MOTOR_PIN1, HIGH);
+    digitalWrite(LEFT_MOTOR_PIN2, LOW);
+
+    digitalWrite(RIGHT_MOTOR_PIN1, HIGH);
+    digitalWrite(RIGHT_MOTOR_PIN2, LOW);
+    while(!resetLocation()){
+      resetLocation();
+    }
+    }
+    digitalWrite(LEFT_MOTOR_PIN1, LOW);
+    digitalWrite(LEFT_MOTOR_PIN2, LOW);
+
+    digitalWrite(RIGHT_MOTOR_PIN1, LOW);
+    digitalWrite(RIGHT_MOTOR_PIN2, LOW);
+    
     driveForwards(.8); //This sets us up right next to the first obstacle, dont change
     //This portion of code checks each lane and gets us to the ending area. (CONDENSE LATER)
     
@@ -501,35 +509,6 @@ void loop() {
       }
     }
     //checking second row
-    /*
-    if (getObstacleDistance() > CHECKING_ULTRASONIC_DISTANCE){ //Checks 1st lane
-      driveForwards(DRIVE_FORWARD_IS_LANE_CLEAR);
-    } else {
-      if (startingPosition) { //Top is true
-       turn(PI/2,LEFT);
-        driveForwards(1-DISTANCE_TO_DRIVE_NEW_LANE);
-        turn(0,RIGHT); //RIGHT
-     } else {
-        turn(-PI/2,RIGHT); //RIGHT
-        driveForwards(1-DISTANCE_TO_DRIVE_NEW_LANE);
-        turn(0,LEFT);
-     }
-      if (getObstacleDistance() > CHECKING_ULTRASONIC_DISTANCE){ //Checks 2nd lane
-        driveForwards(DRIVE_FORWARD_IS_LANE_CLEAR);
-      } else {
-        if (startingPosition) { //Top is true
-          turn(PI/2,LEFT);
-          driveForwards(1-DISTANCE_TO_DRIVE_NEW_LANE);
-          turn(0,RIGHT); //RIGHT
-       } else {
-          turn(-PI/2,RIGHT); //RIGHT
-          driveForwards(1-DISTANCE_TO_DRIVE_NEW_LANE);
-          turn(0,LEFT);
-        }
-        driveForwards(DRIVE_FORWARD_IS_LANE_CLEAR); //If we're at the 3rd lane, we assume that it's the clear one
-      }
-    }
-    */
     
     //This portion of code gets us facing the log and drives over it.
     
@@ -540,11 +519,11 @@ void loop() {
       turn(0,RIGHT); //RIGHT
     }
     
-    myServo.attach(SERVO_PIN);
-    delay(3000);
-    myServo.write(25);
+    //myServo.attach(SERVO_PIN);
+    //delay(3000);
+    //myServo.write(25);
     delay(2000);
-    myServo.detach();
+    //myServo.detach();
     driveForwards(.7);
     
     //We should be over the finish line now
