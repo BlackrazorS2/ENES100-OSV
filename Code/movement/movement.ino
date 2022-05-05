@@ -374,7 +374,8 @@ void loop() {
     //START OF ACTUAL MISSION
     
     //This portion of code determines starting side and gets us to the mission site.
-    
+    myServo.attach(SERVO_PIN);
+    myServo.detach();
     startingPosition = getStartingSide();
     if (startingPosition) {
       turn(-PI/2,LEFT); //Current direction of turning is arbitrary, create method of determining later.
@@ -395,8 +396,10 @@ void loop() {
     
     myServo.attach(SERVO_PIN);
     delay(5000);
+    myServo.write(80);
     myServo.write(35);
     Serial.println("Arm Dropped");
+    Enes100.println("Arm Dropped");
     double signal = -1;
     boolean magnetic = false;
 
@@ -404,15 +407,15 @@ void loop() {
 // -----    
 // THIS BLOCK WAS MODIFIED TO ENSURE THAT A GUESS IS MADE IN NO READ
 
-    int time = millis();
     do {
       signal = getSignal();
       magnetic = (magnetic) ? true : getMagnetism();
       wiggle();
       //DELETE THIS OR RIGHT STATEMENT CRAP IF BAD
-    } while((signal <= 0) && ((millis() - time) < 20000));
+      Enes100.println("WHILE RAN");
+    } while((signal <= 0) && yPos > 1.1);
 
-    // DELETE IF BREAKS
+    // DELETE IF IT DOESNT WORK
     if (signal < -.5) {
       signal = 5; 
     }
@@ -423,16 +426,16 @@ void loop() {
     Enes100.println(signal);
     Serial.print("The signal is: ");
     Serial.println(signal);
-    Enes100.mission(CYCLE, signal*10);
+    //Enes100.mission(CYCLE, signal*10);
     if (magnetic){
       Enes100.print("The puck was magnetic");
       Serial.print("The puck was magnetic");
-      Enes100.mission(MAGNETISM, MAGNETIC);
+      //Enes100.mission(MAGNETISM, MAGNETIC);
       
     } else {
       Enes100.print("The puck was not magnetic");
       Serial.print("The puck was not magnetic");
-      Enes100.mission(MAGNETISM, NOT_MAGNETIC);
+      //Enes100.mission(MAGNETISM, NOT_MAGNETIC);
     }
     delay(1000);
     myServo.write(120);
@@ -444,7 +447,7 @@ void loop() {
   
     //This portion of code sets up the vehicle to start checking each lane.
     delay(3000);
-    driveReverse(.8);
+    driveReverse(.9);
     delay(5000);
 
     //ALL .5 is checking ultrasonic distance
@@ -453,7 +456,7 @@ void loop() {
 
     double CHECKING_ULTRASONIC_DISTANCE = 1.5;
     double DRIVE_FORWARD_IS_LANE_CLEAR = 1.5;
-    double DISTANCE_TO_DRIVE_NEW_LANE = .7;
+    double DISTANCE_TO_DRIVE_NEW_LANE = .65;
 
     
     if (startingPosition) {
@@ -461,7 +464,7 @@ void loop() {
     } else {
       turn(0,RIGHT); //RIGHT
     }
-    driveForwards(CHECKING_ULTRASONIC_DISTANCE); //This sets us up right next to the first obstacle, dont change
+    driveForwards(.8); //This sets us up right next to the first obstacle, dont change
     //This portion of code checks each lane and gets us to the ending area. (CONDENSE LATER)
     
     //checking first row
