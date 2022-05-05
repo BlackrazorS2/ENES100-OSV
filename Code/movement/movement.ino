@@ -413,6 +413,9 @@ void loop() {
       wiggle();
       //DELETE THIS OR RIGHT STATEMENT CRAP IF BAD
       Enes100.println("WHILE RAN");
+      if(signal == null){
+        signal = 0.0;
+      }
     } while((signal <= 0) && yPos > 1.1);
 
     // DELETE IF IT DOESNT WORK
