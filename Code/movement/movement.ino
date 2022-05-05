@@ -264,7 +264,55 @@ void loop() {
     Serial.println("");
     Serial.println("done");
     */
+
+    //ARM TEST 2 ELECTRIC BOOGALOO
+    /*
+    myServo.attach(SERVO_PIN);
+    delay(5000);
+    myServo.write(32);
+    Serial.println("Arm Dropped");
+    double signal = -1;
+    boolean magnetic = false;
+
+
+// -----    
+// THIS BLOCK WAS MODIFIED TO ENSURE THAT A GUESS IS MADE IN NO READ
+
+    int time = millis();
+    do {
+      signal = getSignal();
+      magnetic = (magnetic) ? true : getMagnetism();
+      wiggle();
+      //DELETE THIS OR RIGHT STATEMENT CRAP IF BAD
+    } while((signal <= 0) && ((millis() - time) < 20000));
+
+    // DELETE IF BREAKS
+    if (signal <= 0) {
+      signal = 5; 
+    }
+
+// -----
     
+    Enes100.print("The signal is: ");
+    Enes100.println(signal);
+    Serial.print("The signal is: ");
+    Serial.println(signal);
+    Enes100.mission(CYCLE, signal*10);
+    if (magnetic){
+      Enes100.print("The puck was magnetic");
+      Serial.print("The puck was magnetic");
+      Enes100.mission(MAGNETISM, MAGNETIC);
+      
+    } else {
+      Enes100.print("The puck was not magnetic");
+      Serial.print("The puck was not magnetic");
+      Enes100.mission(MAGNETISM, NOT_MAGNETIC);
+    }
+    delay(1000);
+    myServo.write(120);
+    delay(3000);
+    myServo.detach();
+    */
     
     //ULTRA SONIC TEST
     /*
@@ -362,10 +410,10 @@ void loop() {
       magnetic = (magnetic) ? true : getMagnetism();
       wiggle();
       //DELETE THIS OR RIGHT STATEMENT CRAP IF BAD
-    } while((signal <= 0) || ((millis() - time) > 10000));
+    } while((signal <= 0) && ((millis() - time) < 20000));
 
     // DELETE IF BREAKS
-    if (signal == -1) {
+    if (signal < -.5) {
       signal = 5; 
     }
 
@@ -375,12 +423,16 @@ void loop() {
     Enes100.println(signal);
     Serial.print("The signal is: ");
     Serial.println(signal);
+    Enes100.mission(CYCLE, signal*10);
     if (magnetic){
       Enes100.print("The puck was magnetic");
       Serial.print("The puck was magnetic");
+      Enes100.mission(MAGNETISM, MAGNETIC);
+      
     } else {
       Enes100.print("The puck was not magnetic");
       Serial.print("The puck was not magnetic");
+      Enes100.mission(MAGNETISM, NOT_MAGNETIC);
     }
     delay(1000);
     myServo.write(120);
@@ -392,22 +444,16 @@ void loop() {
   
     //This portion of code sets up the vehicle to start checking each lane.
     delay(3000);
-    driveReverse(.6);
-    myServo.attach(SERVO_PIN);
-    delay(5000);
-    myServo.write(15);
-    delay(2000);
-    driveReverse(.2); //The two drive Reverse functions set us up in our first lane and don't need to be changed
-    myServo.detach();
+    driveReverse(.8);
     delay(5000);
 
     //ALL .5 is checking ultrasonic distance
     //ALL .9 is distance to drive forward is lane is clear
     //ALL .6 is distance to drive (in y-dir) to get to new lane (.4 is also this)
 
-    double CHECKING_ULTRASONIC_DISTANCE = .5;
-    double DRIVE_FORWARD_IS_LANE_CLEAR = .905;
-    double DISTANCE_TO_DRIVE_NEW_LANE = .6;
+    double CHECKING_ULTRASONIC_DISTANCE = 1.5;
+    double DRIVE_FORWARD_IS_LANE_CLEAR = 1.5;
+    double DISTANCE_TO_DRIVE_NEW_LANE = .7;
 
     
     if (startingPosition) {
@@ -447,6 +493,7 @@ void loop() {
       }
     }
     //checking second row
+    /*
     if (getObstacleDistance() > CHECKING_ULTRASONIC_DISTANCE){ //Checks 1st lane
       driveForwards(DRIVE_FORWARD_IS_LANE_CLEAR);
     } else {
@@ -474,6 +521,7 @@ void loop() {
         driveForwards(DRIVE_FORWARD_IS_LANE_CLEAR); //If we're at the 3rd lane, we assume that it's the clear one
       }
     }
+    */
     
     //This portion of code gets us facing the log and drives over it.
     
@@ -483,11 +531,14 @@ void loop() {
       driveForwards(.6);
       turn(0,RIGHT); //RIGHT
     }
+    /*
+    myServo.attach(SERVO_PIN);
+    delay(3000);
     myServo.write(25);
+    */
     driveForwards(.7);
     
     //We should be over the finish line now
-    
 }
 
 
@@ -595,17 +646,6 @@ void turn(double turnAngle, boolean turningLeft) {
   //break;
 }
 
-/*
-*void raiseArm(double armAngle) {  //We might want to condense these 2 into one function by adding a boolean condition for dropping or raising
-*  double val = 10.0;
-*  for (int i = 0; i < val; i++) {
-*      myServo.write(armAngle/val);
-*      delay(50000/val);  
-*      break;
-*  }
-*}
-*/
-
 double getObstacleDistance() {
   digitalWrite(ULTRA_SONIC_PWM, LOW);
   delayMicroseconds(2);
@@ -631,12 +671,12 @@ boolean getStartingSide() {
 boolean atMissionSite() {
   resetLocation();
   if (startingPosition) {
-    if (yPos > .7 && yPos < .85) { //Change values after testing aruco marker placement
+    if (yPos > .6 && yPos < .85) { //Change values after testing aruco marker placement
       // FORMERLY yPos > .6 && yPos < .85
       return true;
     }
   } else {
-    if (yPos > 1.2 && yPos < 1.4) { //Change values after testing aruco marker placement
+    if (yPos > 1.15 && yPos < 1.4) { //Change values after testing aruco marker placement
       // FORMERLY yPos > 1.15 && yPos < 1.4
       return true;
     }
