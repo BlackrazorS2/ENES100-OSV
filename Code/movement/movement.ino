@@ -323,7 +323,7 @@ void loop() {
       turn(PI/2 - .01,RIGHT);  //RIGHT
     }
     delay(1000);
-    driveForwards(.775);
+    driveForwards(.78);
     
     while (atMissionSite() == false){
       driveForwards(.05);
@@ -349,11 +349,11 @@ void loop() {
       //DELETE THIS OR RIGHT STATEMENT CRAP IF BAD
       Enes100.println("WHILE RAN");
       if(startingPosition){
-        if(yPos > 1){
+        if(yPos > .8){
           break;
         }
       } else {
-        if(yPos < 1){
+        if(yPos < 1.2){
           break;
         }
       }
