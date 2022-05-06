@@ -58,11 +58,11 @@ void setup() {
     pinMode(LEFT_MOTOR_PIN2, OUTPUT);
     pinMode(RIGHT_MOTOR_PIN1, OUTPUT);
     pinMode(RIGHT_MOTOR_PIN2, OUTPUT);
-    pinMode(SERVO_PIN, OUTPUT);
     pinMode(ULTRA_SONIC_PWM, OUTPUT);
 
     Serial.begin(9600);
     Serial.println("Running");
+    myServo.attach(SERVO_PIN);
 }
 
 void loop() {
@@ -103,48 +103,9 @@ void loop() {
     Enes100.print("Current angle is: ");
     Enes100.println(angle);
     // Update the OSV's current location
-    
-
-
 
     //////////////////////////////
     //START OF TESTING CODE
-
-    //NAVIGATE MISSION TEST
-    /*
-    if (resetLocation() == false) {
-      // emergency reverse
-      Enes100.println("BRUH HOW OUT OF AREANNA");
-      Enes100.println("WRITE THIS LATER, PROLLY BACKUP OSV");
-      delay(1000);
-    } else {
-       Enes100.updateLocation();
-       Enes100.println("Location found");  //DELETE LATER 
-       Enes100.print("x Position is: ");
-       Enes100.println(xPos);
-       Enes100.print("y Position is: ");
-       Enes100.println(yPos);
-       Enes100.print("Current angle is: ");
-       Enes100.println(angle);
-       delay(1000);
-    }
-    
-    Enes100.println("7 seconds until start");
-    delay(7500);
-    Enes100.println("Starting now");
-    driveForwards(.2);
-    Enes100.updateLocation();
-       Enes100.println("Location found");  //DELETE LATER 
-       Enes100.print("x Position is: ");
-       Enes100.println(xPos);
-       Enes100.print("y Position is: ");
-       Enes100.println(yPos);
-       Enes100.print("Current angle is: ");
-       Enes100.println(angle);
-       delay(1000);
-    delay(500);
-    raiseArm(5);
-    */
 
     //LIMBO TEST
     /*
@@ -155,22 +116,6 @@ void loop() {
 
     digitalWrite(RIGHT_MOTOR_PIN1, HIGH);
     digitalWrite(RIGHT_MOTOR_PIN2, LOW);
-    */
-    
-    //SERVO TEST
-
-
-    /*
-    delay(3000);
-    raiseArm(10);
-    Serial.println("Moved");
-    delay(1000);
-    raiseArm(0);
-    Serial.println("Moved");
-    delay(1000);
-    raiseArm(10);
-    Serial.println("Moved");
-    delay(1000);
     */
 
     //MOVEMENT FUNCTIONS TEST
@@ -213,11 +158,11 @@ void loop() {
     delay(1000);
     
     
-//    Enes100.println("Signal is: ");
-//    Enes100.println(getSignal());
-//    Serial.println("Signal is: ");
-//    Serial.println(getSignal());
-//    delay(500);
+    Enes100.println("Signal is: ");
+    Enes100.println(getSignal());
+    Serial.println("Signal is: ");
+    Serial.println(getSignal());
+    delay(500);
     */
 
     
@@ -272,30 +217,22 @@ void loop() {
     //ARM TEST 2 ELECTRIC BOOGALOO
     /*
     myServo.attach(SERVO_PIN);
-    delay(5000);
+    delay(2000);
     myServo.write(32);
     Serial.println("Arm Dropped");
     double signal = -1;
     boolean magnetic = false;
 
-
-// -----    
-// THIS BLOCK WAS MODIFIED TO ENSURE THAT A GUESS IS MADE IN NO READ
-
     do {
       signal = getSignal();
       magnetic = (magnetic) ? true : getMagnetism();
-      wiggle();
-      //DELETE THIS OR RIGHT STATEMENT CRAP IF BAD
+      //wiggle();
     } while((signal <= 0));
 
     // DELETE IF NO WORK
     if (signal <= 0) {
       signal = 5; 
     }
-
-// -----
-    
     Enes100.print("The signal is: ");
     Enes100.println(signal);
     Serial.print("The signal is: ");
@@ -318,8 +255,8 @@ void loop() {
     */
     
     //ULTRA SONIC TEST
-    /*
     
+    /*
     Enes100.println("Ultra sonic sensor distance");
     Enes100.println(getObstacleDistance());
     Serial.println("Ultra sonic sensor distance");
@@ -378,13 +315,15 @@ void loop() {
     
     //This portion of code determines starting side and gets us to the mission site.
     startingPosition = getStartingSide();
+
+    
     if (startingPosition) {
       turn(-PI/2 + .01,LEFT); //Current direction of turning is arbitrary, create method of determining later.
     } else {
       turn(PI/2 - .01,RIGHT);  //RIGHT
     }
     delay(1000);
-    driveForwards(.75);
+    driveForwards(.775);
     
     while (atMissionSite() == false){
       driveForwards(.05);
@@ -402,9 +341,6 @@ void loop() {
     double signal = -1;
     boolean magnetic = false;
 
-
-// -----    
-// THIS BLOCK WAS MODIFIED TO ENSURE THAT A GUESS IS MADE IN NO READ
     
     do {
       signal = getSignal();
@@ -412,30 +348,39 @@ void loop() {
       wiggle();
       //DELETE THIS OR RIGHT STATEMENT CRAP IF BAD
       Enes100.println("WHILE RAN");
-    } while((signal <= 0) && yPos > 1.1);
+      if(startingPosition){
+        if(yPos > 1){
+          break;
+        }
+      } else {
+        if(yPos < 1){
+          break;
+        }
+      }
+      resetLocation();
+    } while((signal <= 0));
 
     // DELETE IF IT DOESNT WORK
     
-    if (signal < -.5) {
+    if (signal <= 0) {
       signal = 5; 
     }
     
-// -----
     
     Enes100.print("The signal is: ");
     Enes100.println(signal);
     Serial.print("The signal is: ");
     Serial.println(signal);
-    //Enes100.mission(CYCLE, signal*10);
+    Enes100.mission(CYCLE, (int)(signal));
     if (magnetic){
       Enes100.print("The puck was magnetic");
       Serial.print("The puck was magnetic");
-      //Enes100.mission(MAGNETISM, MAGNETIC);
+      Enes100.mission(MAGNETISM, MAGNETIC);
       
     } else {
       Enes100.print("The puck was not magnetic");
       Serial.print("The puck was not magnetic");
-      //Enes100.mission(MAGNETISM, NOT_MAGNETIC);
+      Enes100.mission(MAGNETISM, NOT_MAGNETIC);
     }
     delay(1000);
     //myServo.write(120);
@@ -447,13 +392,9 @@ void loop() {
     //myServo.write(25);
     //myServo.detach();
 
-    //ALL .5 is checking ultrasonic distance
-    //ALL .9 is distance to drive forward is lane is clear
-    //ALL .6 is distance to drive (in y-dir) to get to new lane (.4 is also this)
-
-    double CHECKING_ULTRASONIC_DISTANCE = 1.5;
-    double DRIVE_FORWARD_IS_LANE_CLEAR = 1.5;
-    double DISTANCE_TO_DRIVE_NEW_LANE = .65;
+    double CHECKING_ULTRASONIC_DISTANCE = .4;
+    double DRIVE_FORWARD_IS_LANE_CLEAR = .7;
+    double DISTANCE_TO_DRIVE_NEW_LANE = .57; // DONE
 
     
     if (startingPosition) {
@@ -463,13 +404,13 @@ void loop() {
     }
     while(xPos < 1){
       digitalWrite(LEFT_MOTOR_PIN1, HIGH);
-    digitalWrite(LEFT_MOTOR_PIN2, LOW);
+      digitalWrite(LEFT_MOTOR_PIN2, LOW);
 
-    digitalWrite(RIGHT_MOTOR_PIN1, HIGH);
-    digitalWrite(RIGHT_MOTOR_PIN2, LOW);
-    while(!resetLocation()){
-      resetLocation();
-    }
+      digitalWrite(RIGHT_MOTOR_PIN1, HIGH);
+      digitalWrite(RIGHT_MOTOR_PIN2, LOW);
+      while(!resetLocation()){
+        resetLocation();
+      }
     }
     digitalWrite(LEFT_MOTOR_PIN1, LOW);
     digitalWrite(LEFT_MOTOR_PIN2, LOW);
@@ -477,12 +418,11 @@ void loop() {
     digitalWrite(RIGHT_MOTOR_PIN1, LOW);
     digitalWrite(RIGHT_MOTOR_PIN2, LOW);
     
-    driveForwards(.8); //This sets us up right next to the first obstacle, dont change
     //This portion of code checks each lane and gets us to the ending area. (CONDENSE LATER)
     
     //checking first row
-    if (getObstacleDistance() > CHECKING_ULTRASONIC_DISTANCE){ //Checks 1st lane     THIS distance is arbitrary and should be changed if swapping to only 1 check
-      driveForwards(DRIVE_FORWARD_IS_LANE_CLEAR);  //ARBITRARY DISTANCE TO DRIVE FORWARD, INCREASE IF CHANGING TO CHECK ONE LANE
+    if (getObstacleDistance() > CHECKING_ULTRASONIC_DISTANCE){ //Checks 1st lane
+      driveForwards(DRIVE_FORWARD_IS_LANE_CLEAR); 
     } else {
       if (startingPosition) { //Top is true
        turn(-PI/2,RIGHT); //RIGHT
@@ -508,7 +448,54 @@ void loop() {
         driveForwards(DRIVE_FORWARD_IS_LANE_CLEAR); //If we're at the 3rd lane, we assume that it's the clear one
       }
     }
-    //checking second row
+    turn(-PI/2,RIGHT);
+    while(yPos > .5){
+      digitalWrite(LEFT_MOTOR_PIN1, HIGH);
+      digitalWrite(LEFT_MOTOR_PIN2, LOW);
+
+      digitalWrite(RIGHT_MOTOR_PIN1, HIGH);
+      digitalWrite(RIGHT_MOTOR_PIN2, LOW);
+      while(!resetLocation()){
+        resetLocation();
+      }
+    }
+    digitalWrite(LEFT_MOTOR_PIN1, LOW);
+    digitalWrite(LEFT_MOTOR_PIN2, LOW);
+
+    digitalWrite(RIGHT_MOTOR_PIN1, LOW);
+    digitalWrite(RIGHT_MOTOR_PIN2, LOW);
+
+    if (getObstacleDistance() > CHECKING_ULTRASONIC_DISTANCE){ //Checks 2nd lane
+      driveForwards(DRIVE_FORWARD_IS_LANE_CLEAR); 
+    } else {
+        turn(PI/2,LEFT);
+        driveForwards(DISTANCE_TO_DRIVE_NEW_LANE);
+        turn(0,RIGHT); //RIGHT
+        
+        if (getObstacleDistance() > CHECKING_ULTRASONIC_DISTANCE){ //Checks 2nd lane
+          driveForwards(DRIVE_FORWARD_IS_LANE_CLEAR); 
+        } else {
+          turn(PI/2,LEFT);
+          driveForwards(DISTANCE_TO_DRIVE_NEW_LANE);
+          turn(0,RIGHT); //RIGHT
+          driveForwards(DRIVE_FORWARD_IS_LANE_CLEAR); 
+        }
+     }
+     while(xPos < 3.2){
+      digitalWrite(LEFT_MOTOR_PIN1, HIGH);
+      digitalWrite(LEFT_MOTOR_PIN2, LOW);
+
+      digitalWrite(RIGHT_MOTOR_PIN1, HIGH);
+      digitalWrite(RIGHT_MOTOR_PIN2, LOW);
+      while(!resetLocation()){
+        resetLocation();
+      }
+    }
+    digitalWrite(LEFT_MOTOR_PIN1, LOW);
+    digitalWrite(LEFT_MOTOR_PIN2, LOW);
+
+    digitalWrite(RIGHT_MOTOR_PIN1, LOW);
+    digitalWrite(RIGHT_MOTOR_PIN2, LOW);
     
     //This portion of code gets us facing the log and drives over it.
     
@@ -673,17 +660,6 @@ boolean atMissionSite() {
 }
 
 int getSignal() {
-  /*
-  double signalValue = 0;
-  for(int i = 0; i < 1000; i++){
-    if(signalValue < (((double) analogRead(A0)) / 1023)) {
-      signalValue = (((double) analogRead(A0)) / 1023) / 2; //gives circuit value from 0-1
-    }
-    delay(1);
-  }
-  return signalValue;
-  */
-
   pwm_value = pulseIn(SIGNAL_PIN, HIGH);
 
     num = round(pwm_value / 1000.0);
