@@ -41,3 +41,13 @@ Starting position - X = -1516.41mm  Y = 108.09 Z =-731.89
 Cup Position - X = -1516.41mm  Y = 108.09 Z = -731.89
 
 First part ends with the front body edge being 232.75mm from the front of the cup
+
+Part 2:
+
+Spin around arena and go up (spline)
+	Rotate OTV during spin so we dont have to do animation
+Overhead view of doing obstacles
+	seperate animation for aruco coming off
+	
+
+Animation 1 should set up the camera so that the OSV can be instantlly rotated
